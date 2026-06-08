@@ -208,7 +208,7 @@ h1, h2, h3, p { margin-top: 0; }
 .button-primary:focus-visible { color: #111; background: linear-gradient(180deg, #ffc174, var(--orange)); }
 .button-ghost { background: rgba(255, 255, 255, 0.035); }
 .button-disabled,
-.button[aria-disabled="true"] { opacity: 0.62; cursor: not-allowed; }
+.button[aria-disabled="true"] { opacity: 0.62; cursor: not-allowed; pointer-events: none; }
 .button-icon { width: 18px; height: 18px; flex: 0 0 18px; object-fit: contain; border-radius: 4px; }
 .button-icon[src$="download-dark.svg"] { border-radius: 0; opacity: 0.96; }
 .button-primary .button-icon[src$="play.svg"] { filter: none; }
