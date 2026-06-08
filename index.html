@@ -9,226 +9,145 @@
     content="Capital Industries is a modded Minecraft server focused on automation, economy, factories, exploration, events, and long-term progression."
   >
 
-  <style>
-    :root {
-      --bg: #0b0c0f;
-      --bg-soft: #111319;
-      --panel: #171a21;
-      --panel-strong: #1f232d;
-      --text: #f4f4f5;
-      --muted: #a7abb5;
-      --orange: #ff8a18;
-      --orange-bright: #ff9f2f;
-      --orange-dark: #cc6410;
-      --line: #2a2f3a;
-      --shadow: rgba(0, 0, 0, 0.42);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      min-height: 100%;
-      background: var(--bg);
-    }
-
-    body {
-      min-height: 100vh;
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 50% 0%, rgba(255, 138, 24, 0.16), transparent 34rem),
-        linear-gradient(180deg, #141720 0%, var(--bg) 58%);
-    }
-
-    main {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 32px 18px;
-    }
-
-    .card {
-      width: min(980px, 100%);
-      padding: clamp(28px, 5vw, 52px);
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      background:
-        linear-gradient(180deg, rgba(31, 35, 45, 0.96), rgba(17, 19, 25, 0.98));
-      box-shadow: 0 24px 72px var(--shadow);
-    }
-
-    .eyebrow {
-      margin: 0 0 14px;
-      color: var(--orange-bright);
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(2.5rem, 8vw, 5.8rem);
-      line-height: 0.95;
-      letter-spacing: -0.06em;
-    }
-
-    .accent {
-      color: var(--orange);
-    }
-
-    .tagline {
-      max-width: 740px;
-      margin: 24px 0 0;
-      color: var(--muted);
-      font-size: clamp(1rem, 2vw, 1.28rem);
-      line-height: 1.6;
-    }
-
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin-top: 34px;
-    }
-
-    .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 48px;
-      padding: 0 18px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      color: var(--text);
-      background: #12151c;
-      font-weight: 700;
-      text-decoration: none;
-      transition:
-        transform 120ms ease,
-        border-color 120ms ease,
-        background 120ms ease;
-    }
-
-    .button:hover,
-    .button:focus {
-      transform: translateY(-1px);
-      border-color: var(--orange);
-      outline: none;
-    }
-
-    .button-primary {
-      border-color: var(--orange);
-      color: #111111;
-      background: linear-gradient(180deg, var(--orange-bright), var(--orange));
-      box-shadow: 0 12px 28px rgba(255, 138, 24, 0.22);
-    }
-
-    .button-primary:hover,
-    .button-primary:focus {
-      border-color: var(--orange-bright);
-      background: linear-gradient(180deg, #ffae4d, var(--orange));
-    }
-
-    .server-info {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      margin-top: 34px;
-    }
-
-    .info-box {
-      min-height: 96px;
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(11, 12, 15, 0.38);
-    }
-
-    .info-title {
-      margin: 0 0 8px;
-      color: var(--orange-bright);
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .info-text {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.45;
-    }
-
-    .note {
-      margin: 30px 0 0;
-      color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.55;
-    }
-
-    code {
-      color: var(--orange-bright);
-      font-family: Consolas, "Courier New", monospace;
-    }
-
-    @media (max-width: 760px) {
-      .server-info {
-        grid-template-columns: 1fr;
-      }
-
-      .button {
-        width: 100%;
-      }
-    }
-  </style>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#ff8a18">
+  <link rel="stylesheet" href="/assets/site.css">
 </head>
 
 <body>
-  <main>
-    <section class="card">
-      <p class="eyebrow">Modded Minecraft Server</p>
 
-      <h1>Capital <span class="accent">Industries</span></h1>
+  <header class="site-header">
+    <div class="site-shell navbar">
+      <a class="brand" href="/" aria-label="Capital Industries home">
+        <img class="brand-icon" src="/assets/brand/server-icon.png" alt="" width="40" height="40">
+        <span class="brand-text">
+          <span class="brand-title">Capital Industries</span>
+          <span class="brand-subtitle">Modded Server</span>
+        </span>
+      </a>
 
-      <p class="tagline">
-        A modded Minecraft server focused on automation, economy, exploration,
-        factories, events, and long-term progression.
-      </p>
-
-      <nav class="actions" aria-label="Server links">
-        <a class="button button-primary" href="/download">Download Launcher</a>
-        <a class="button" href="/store">Store</a>
-        <a class="button" href="https://discord.gg/jj7fFEYYfk">Discord</a>
-        <a class="button" href="https://www.curseforge.com/minecraft/modpacks/capital-industries-server">CurseForge</a>
-        <a class="button" href="https://www.modpackindex.com/modpack/117341/capital-industries-server">Modpack Index</a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a class="nav-link" href="/download">Download</a>
+        <a class="nav-link" href="/store">Store</a>
+        <a class="nav-link" href="/map">Map</a>
+        <a class="nav-link" href="https://discord.gg/jj7fFEYYfk">Discord</a>
+        <a class="nav-link nav-link-cta" href="/download">Play</a>
       </nav>
+    </div>
+  </header>
 
-      <div class="server-info">
-        <article class="info-box">
-          <p class="info-title">Join Address</p>
-          <p class="info-text"><code>play.capitalindustries.net</code></p>
-        </article>
+  <main>
+    <section class="site-shell hero">
+      <div>
+        <p class="eyebrow">Automation · Economy · Exploration</p>
+        <h1 class="hero-title">Capital <span class="accent">Industries</span></h1>
+        <p class="tagline">
+          A Create-centered modded Minecraft server built around factories,
+          server events, exploration, and long-term progression without forcing
+          every player into the same path.
+        </p>
 
-        <article class="info-box">
-          <p class="info-title">Install Method</p>
-          <p class="info-text">Use the custom CCI Launcher for the intended setup.</p>
-        </article>
+        <div class="hero-actions" aria-label="Primary actions">
+          <a class="button button-primary" href="/download">Download Launcher</a>
+          <a class="button" href="/map">View Live Map</a>
+          <a class="button button-ghost" href="/store">View Ranks</a>
+          <a class="button button-ghost" href="https://discord.gg/jj7fFEYYfk">Join Discord</a>
+        </div>
 
-        <article class="info-box">
-          <p class="info-title">Pack Mirrors</p>
-          <p class="info-text">Available through CurseForge and Modpack Index.</p>
-        </article>
+        <div class="copy-line" aria-label="Server address">
+          <span class="copy-value">play.capitalindustries.net</span>
+          <button
+            class="button copy-button"
+            type="button"
+            data-copy-value="play.capitalindustries.net"
+          >Copy</button>
+        </div>
       </div>
 
-      <p class="note">
-        Download the launcher, join the Discord, then connect using
-        <code>play.capitalindustries.net</code>.
-      </p>
+      <div class="hero-art" aria-hidden="true">
+        <div class="orbit-card">
+          <img class="hero-server-icon" src="/assets/brand/server-icon.png" alt="">
+        </div>
+        <div class="stat-strip">
+          <span class="stat-label">Current Season</span>
+          <span class="stat-value">Capital Industries</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="site-shell section">
+      <div class="section-heading">
+        <h2 class="section-title">Built for long-term modded play.</h2>
+        <p class="section-text">
+          The site now pushes players toward the launcher, map, Discord, and
+          ranks first. The server address is still available, but it is no
+          longer the center of the page.
+        </p>
+      </div>
+
+      <div class="card-grid">
+        <article class="feature-card">
+          <div class="feature-icon">⚙</div>
+          <h3 class="feature-title">Factory progression</h3>
+          <p class="feature-text">
+            Automation, production chains, and Create-based infrastructure are
+            core to the server identity.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">⌁</div>
+          <h3 class="feature-title">Live world map</h3>
+          <p class="feature-text">
+            A dedicated map route is ready for BlueMap once the map subdomain
+            or proxy is connected.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">◆</div>
+          <h3 class="feature-title">Events and seasons</h3>
+          <p class="feature-text">
+            The layout is generic enough for future modes, skyblock variants,
+            events, or a broader network page.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="site-shell section">
+      <div class="panel link-panel">
+        <div>
+          <h2 class="link-title">Need the modpack without the launcher?</h2>
+          <p class="link-text">
+            The launcher should be the main path later, but CurseForge and
+            Modpack Index remain available as fallback mirrors.
+          </p>
+        </div>
+        <div class="actions">
+          <a class="button" href="https://www.curseforge.com/minecraft/modpacks/capital-industries-server">CurseForge</a>
+          <a class="button" href="https://www.modpackindex.com/modpack/117341/capital-industries-server">Modpack Index</a>
+        </div>
+      </div>
     </section>
   </main>
+
+
+  <footer class="footer">
+    <div class="site-shell footer-inner">
+      <span>Capital Industries · Modded Minecraft Server</span>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="/download">Launcher</a>
+        <a href="/store">Ranks</a>
+        <a href="/map">Live Map</a>
+        <a href="https://www.curseforge.com/minecraft/modpacks/capital-industries-server">CurseForge</a>
+        <a href="https://www.modpackindex.com/modpack/117341/capital-industries-server">Modpack Index</a>
+      </nav>
+    </div>
+  </footer>
+  <script src="/assets/site.js" defer></script>
 </body>
 </html>
