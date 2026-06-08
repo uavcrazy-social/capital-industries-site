@@ -75,7 +75,7 @@
 
     ticking = true;
     window.requestAnimationFrame(function () {
-      var y = Math.round(window.scrollY * -0.16);
+      var y = Math.round(window.scrollY / -3);
       document.documentElement.style.setProperty("--parallax-y", y + "px");
       ticking = false;
     });
