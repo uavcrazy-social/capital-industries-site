@@ -210,6 +210,7 @@ h1, h2, h3, p { margin-top: 0; }
 .button-disabled,
 .button[aria-disabled="true"] { opacity: 0.62; cursor: not-allowed; }
 .button-icon { width: 18px; height: 18px; flex: 0 0 18px; object-fit: contain; border-radius: 4px; }
+.button-icon[src$="download-dark.svg"] { border-radius: 0; opacity: 0.96; }
 .button-primary .button-icon[src$="play.svg"] { filter: none; }
 
 .hero-art { position: relative; display: grid; place-items: center; min-height: 300px; }
