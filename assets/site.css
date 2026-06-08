@@ -471,3 +471,10 @@ h1, h2, h3, p { margin-top: 0; }
   .map-hero-panel { grid-template-columns: 1fr; }
   .map-card-logo { width: 72px; height: 72px; }
 }
+
+/* Real service icons: keep small prefix glyphs crisp without clipping. */
+.button-icon[src$="curseforge.png"],
+.quick-link img[src$="curseforge.png"] {
+  object-fit: contain;
+  border-radius: 5px;
+}
