@@ -4,21 +4,66 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Page Not Found | Capital Industries</title>
+  <meta name="robots" content="noindex">
   <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="prefetch" href="/download/">
+  <link rel="prefetch" href="/store/">
+  <link rel="prefetch" href="/map/">
+  <meta name="theme-color" content="#ff8a18">
   <link rel="stylesheet" href="/assets/site.css">
 </head>
 <body>
-  <main class="page-hero container reveal">
-    <p class="kicker">404</p>
-    <h1 class="page-title">That page is not <span class="accent">built yet.</span></h1>
-    <p class="page-lead">Use the launcher, store, map, or Discord links to get back into the server flow.</p>
-    <div class="action-row">
-      <a class="button button-primary" href="/">Home</a>
-      <a class="button" href="/download">Launcher</a>
-      <a class="button" href="/store">Store</a>
-      <a class="button" href="/map">Map</a>
+
+  <header class="site-header">
+    <div class="site-shell navbar">
+      <a class="brand" href="/" aria-label="Capital Industries home">
+        <img class="brand-icon" src="/assets/brand/server-icon.png" alt="" width="40" height="40">
+        <span class="brand-text">
+          <span class="brand-title">Capital Industries</span>
+          <span class="brand-subtitle">Season 3</span>
+        </span>
+      </a>
+
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a class="nav-link" href="/download">Download</a>
+        <a class="nav-link" href="/store">Store</a>
+        <a class="nav-link" href="/map">Map</a>
+        <a class="nav-link" href="https://discord.gg/jj7fFEYYfk">Discord</a>
+        <a class="nav-link nav-link-cta" href="/download">Play</a>
+      </nav>
     </div>
+  </header>
+  <main>
+    <section class="site-shell hero hero-compact">
+      <div data-reveal>
+        <p class="eyebrow">404</p>
+        <h1 class="page-title">Page <span class="accent">Not Found</span></h1>
+        <p class="tagline">That route does not exist yet.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="/">Back Home</a>
+          <a class="button" href="/download">Download Launcher</a>
+          <a class="button" href="/map">Map</a>
+        </div>
+      </div>
+    </section>
   </main>
+
+  <footer class="footer">
+    <div class="site-shell footer-inner">
+      <span>Capital Industries · Season 3 Modded Minecraft</span>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="/download">Launcher</a>
+        <a href="/store">Ranks</a>
+        <a href="/map">Live Map</a>
+        <a href="https://discord.gg/jj7fFEYYfk">Discord</a>
+        <a href="https://www.curseforge.com/minecraft/modpacks/capital-industries-server">CurseForge</a>
+        <a href="https://www.modpackindex.com/modpack/117341/capital-industries-server">Modpack Index</a>
+      </nav>
+    </div>
+  </footer>
   <script src="/assets/site.js" defer></script>
 </body>
 </html>
