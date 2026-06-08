@@ -78,14 +78,16 @@ body::after {
   pointer-events: none;
   content: "";
   background:
-    radial-gradient(circle, rgba(255, 138, 24, 0.17) 0%, rgba(255, 138, 24, 0.07) 34%, transparent 68%),
-    radial-gradient(circle, rgba(255, 173, 69, 0.12) 0%, rgba(255, 138, 24, 0.055) 36%, transparent 70%),
-    radial-gradient(circle, rgba(255, 138, 24, 0.11) 0%, rgba(255, 138, 24, 0.045) 34%, transparent 72%),
-    radial-gradient(circle, rgba(255, 173, 69, 0.085) 0%, rgba(255, 138, 24, 0.035) 38%, transparent 74%),
-    linear-gradient(90deg, transparent, rgba(255, 138, 24, 0.034), transparent);
+    radial-gradient(circle, rgba(255, 138, 24, 0.15) 0%, rgba(255, 138, 24, 0.062) 34%, transparent 68%),
+    radial-gradient(circle, rgba(255, 173, 69, 0.11) 0%, rgba(255, 138, 24, 0.050) 36%, transparent 70%),
+    radial-gradient(circle, rgba(255, 138, 24, 0.10) 0%, rgba(255, 138, 24, 0.040) 34%, transparent 72%),
+    radial-gradient(circle, rgba(255, 173, 69, 0.078) 0%, rgba(255, 138, 24, 0.032) 38%, transparent 74%),
+    radial-gradient(circle, rgba(255, 138, 24, 0.085) 0%, rgba(255, 138, 24, 0.034) 36%, transparent 72%),
+    radial-gradient(circle, rgba(255, 173, 69, 0.070) 0%, rgba(255, 138, 24, 0.028) 40%, transparent 76%),
+    linear-gradient(90deg, transparent, rgba(255, 138, 24, 0.030), transparent);
   background-repeat: no-repeat;
-  background-size: 38rem 38rem, 34rem 34rem, 32rem 32rem, 30rem 30rem, 100% 100%;
-  background-position: -8rem 2rem, calc(100% - 28rem) 24rem, 10vw 78rem, calc(100% - 22rem) 128rem, center;
+  background-size: 34rem 34rem, 30rem 30rem, 28rem 28rem, 26rem 26rem, 24rem 24rem, 22rem 22rem, 100% 100%;
+  background-position: -7rem 2rem, calc(100% - 25rem) 22rem, 9vw 68rem, calc(100% - 20rem) 112rem, 14vw 158rem, calc(100% - 18rem) 202rem, center;
   opacity: 0.94;
   transform: translate3d(0, var(--parallax-y), 0);
   will-change: transform, background-position;
@@ -136,15 +138,28 @@ code { color: var(--orange-bright); font-family: "SFMono-Regular", Consolas, "Li
 
 .nav-links { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
 .nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   padding: 10px 12px;
   border: 1px solid transparent;
   border-radius: 999px;
   color: var(--muted);
   font-size: 0.94rem;
   font-weight: 700;
+  line-height: 1;
   text-decoration: none;
   transition: background 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
 }
+.nav-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+.nav-icon-play { filter: none; }
 .nav-link:hover,
 .nav-link:focus-visible,
 .nav-link-active {
@@ -457,13 +472,16 @@ h1, h2, h3, p { margin-top: 0; }
   .orbit-card::after { animation: orbit-two 24s linear infinite reverse; }
   @keyframes ambient-glow-drift {
     0% {
-      background-position: -8rem 2rem, calc(100% - 28rem) 24rem, 10vw 78rem, calc(100% - 22rem) 128rem, center;
+      background-size: 34rem 34rem, 30rem 30rem, 28rem 28rem, 26rem 26rem, 24rem 24rem, 22rem 22rem, 100% 100%;
+      background-position: -7rem 2rem, calc(100% - 25rem) 22rem, 9vw 68rem, calc(100% - 20rem) 112rem, 14vw 158rem, calc(100% - 18rem) 202rem, center;
     }
     50% {
-      background-position: -5rem 8rem, calc(100% - 34rem) 31rem, 14vw 86rem, calc(100% - 17rem) 120rem, center;
+      background-size: 37rem 37rem, 28rem 28rem, 31rem 31rem, 24rem 24rem, 27rem 27rem, 20rem 20rem, 100% 100%;
+      background-position: -4rem 7rem, calc(100% - 31rem) 29rem, 13vw 76rem, calc(100% - 15rem) 104rem, 10vw 166rem, calc(100% - 23rem) 194rem, center;
     }
     100% {
-      background-position: -11rem 13rem, calc(100% - 24rem) 18rem, 7vw 92rem, calc(100% - 29rem) 134rem, center;
+      background-size: 32rem 32rem, 32rem 32rem, 26rem 26rem, 28rem 28rem, 22rem 22rem, 24rem 24rem, 100% 100%;
+      background-position: -10rem 12rem, calc(100% - 21rem) 16rem, 6vw 84rem, calc(100% - 27rem) 120rem, 17vw 152rem, calc(100% - 14rem) 210rem, center;
     }
   }
   @keyframes orbit-one { to { transform: rotate(384deg); } }
@@ -472,7 +490,7 @@ h1, h2, h3, p { margin-top: 0; }
 }
 
 @media (prefers-reduced-motion: no-preference) and (min-width: 681px) {
-  body::after { animation: ambient-glow-drift 80s ease-in-out infinite alternate; }
+  body::after { animation: ambient-glow-drift 53s ease-in-out infinite alternate; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -514,14 +532,15 @@ h1, h2, h3, p { margin-top: 0; }
     left: -24vw;
     width: 148vw;
     height: max(300vh, 2200px);
-    background-size: 26rem 26rem, 24rem 24rem, 23rem 23rem, 22rem 22rem, 100% 100%;
-    background-position: -9rem 5rem, calc(100% - 18rem) 24rem, 4vw 66rem, calc(100% - 17rem) 108rem, center;
+    background-size: 24rem 24rem, 22rem 22rem, 21rem 21rem, 20rem 20rem, 19rem 19rem, 18rem 18rem, 100% 100%;
+    background-position: -9rem 5rem, calc(100% - 17rem) 24rem, 4vw 60rem, calc(100% - 16rem) 98rem, 8vw 136rem, calc(100% - 15rem) 170rem, center;
     opacity: 0.82;
   }
   .site-shell { width: min(100% - 28px, var(--container)); }
   .navbar { align-items: flex-start; flex-direction: column; padding: 14px 0; }
   .nav-links { justify-content: flex-start; width: 100%; }
-  .nav-link { padding: 9px 10px; font-size: 0.88rem; }
+  .nav-link { gap: 6px; padding: 9px 10px; font-size: 0.88rem; }
+  .nav-icon { width: 15px; height: 15px; flex-basis: 15px; }
   .hero { padding-top: 32px; }
   .hero-title,
   .page-title { letter-spacing: -0.06em; }
