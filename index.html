@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Capital Industries</title>
+  <meta name="description" content="Capital Industries is a modded Minecraft server focused on automation, economy, exploration, and events.">
+  <style>
+    :root {
+      --bg: #0f1117;
+      --panel: #171a23;
+      --text: #f2f4f8;
+      --muted: #aab2c0;
+      --accent: #ffb000;
+      --line: #2a2f3d;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #22283a, var(--bg));
+      color: var(--text);
+    }
+
+    main {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 32px;
+    }
+
+    .card {
+      width: min(900px, 100%);
+      background: rgba(23, 26, 35, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 36px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2.2rem, 6vw, 4.5rem);
+      line-height: 1;
+    }
+
+    .tagline {
+      margin: 0 0 28px;
+      color: var(--muted);
+      font-size: 1.2rem;
+      line-height: 1.5;
+    }
+
+    .join {
+      display: inline-block;
+      padding: 14px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      color: var(--text);
+      background: rgba(255, 176, 0, 0.12);
+      font-family: Consolas, monospace;
+      font-size: 1.1rem;
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    a {
+      color: var(--text);
+      text-decoration: none;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: #12151d;
+    }
+
+    a:hover {
+      border-color: var(--accent);
+    }
+
+    .note {
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card">
+      <h1>Capital Industries</h1>
+      <p class="tagline">
+        A modded Minecraft server focused on automation, economy, exploration,
+        factories, events, and long-term progression.
+      </p>
+
+      <div class="join">play.capitalindustries.net</div>
+
+      <nav class="links" aria-label="Server links">
+        <a href="https://www.curseforge.com/minecraft/modpacks/capital-industries-server">CurseForge</a>
+        <a href="https://www.modpackindex.com/modpack/117341/capital-industries-server">Modpack Index</a>
+        <a href="#">Discord</a>
+        <a href="#">Rules</a>
+      </nav>
+
+      <p class="note">
+        Join the server with the address above. More server info, ranks, rules,
+        events, and wiki pages are coming soon.
+      </p>
+    </section>
+  </main>
+</body>
+</html>
