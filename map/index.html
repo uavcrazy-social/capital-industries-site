@@ -3,86 +3,64 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Live Map | Capital Industries</title>
-  <meta
-    name="description"
-    content="Open the Capital Industries live world map."
-  >
-
+  <title>World Map | Capital Industries</title>
+  <meta name="description" content="Open the Capital Industries live BlueMap world map.">
   <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
-  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" href="/favicon-32.png" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
-  <meta name="theme-color" content="#ff8a18">
   <link rel="stylesheet" href="/assets/site.css">
 </head>
-
 <body>
-
-  <header class="site-header">
-    <div class="site-shell navbar">
-      <a class="brand" href="/" aria-label="Capital Industries home">
-        <img class="brand-icon" src="/assets/brand/server-icon.png" alt="" width="40" height="40">
-        <span class="brand-text">
-          <span class="brand-title">Capital Industries</span>
-          <span class="brand-subtitle">Modded Server</span>
-        </span>
-      </a>
-
-      <nav class="nav-links" aria-label="Primary navigation">
-        <a class="nav-link" href="/download">Download</a>
-        <a class="nav-link" href="/store">Store</a>
-        <a class="nav-link" href="/map">Map</a>
-        <a class="nav-link" href="https://discord.gg/jj7fFEYYfk">Discord</a>
-        <a class="nav-link nav-link-cta" href="/download">Play</a>
-      </nav>
-    </div>
-  </header>
-
-  <main>
-    <section class="site-shell hero hero-compact">
-      <div>
-        <p class="eyebrow">Capital Industries Map</p>
-        <h1 class="page-title">Live <span class="accent">Map</span></h1>
-        <p class="tagline">
-          This route is ready for BlueMap or another live world map. Point the
-          map button at your final map host once the map subdomain is connected.
-        </p>
-      </div>
-    </section>
-
-    <section class="site-shell section">
-      <div class="panel map-card">
-        <span class="status-pill">Map Portal</span>
-        <h2 class="section-title" style="margin-top: 18px;">Open the world map.</h2>
-        <p class="section-text">
-          Default target is <code>https://map.capitalindustries.net</code>.
-          If BlueMap is still exposed by raw IP and port, update this link after
-          the map DNS/proxy is configured.
-        </p>
-
-        <div class="actions">
-          <a class="button button-primary" href="https://map.capitalindustries.net">Open Live Map</a>
-          <a class="button" href="/download">Download Launcher</a>
-          <a class="button button-ghost" href="https://discord.gg/jj7fFEYYfk">Discord</a>
+  <div class="site-shell">
+    <header class="site-header">
+      <nav class="navbar container" aria-label="Primary navigation">
+        <a class="brand-link" href="/">
+          <img class="brand-mark" src="/assets/brand/server-logo-320.png" alt="">
+          <span class="brand-copy"><span class="brand-title">Capital Industries</span><span class="brand-subtitle">Season 3</span></span>
+        </a>
+        <div class="nav-links">
+          <a class="nav-link" href="/download">Launcher</a>
+          <a class="nav-link" href="/store">Store</a>
+          <a class="nav-link" aria-current="page" href="/map">Map</a>
+          <a class="nav-link" href="https://discord.gg/jj7fFEYYfk">Discord</a>
         </div>
-      </div>
-    </section>
-  </main>
-
-
-  <footer class="footer">
-    <div class="site-shell footer-inner">
-      <span>Capital Industries · Modded Minecraft Server</span>
-      <nav class="footer-links" aria-label="Footer links">
-        <a href="/download">Launcher</a>
-        <a href="/store">Ranks</a>
-        <a href="/map">Live Map</a>
-        <a href="https://www.curseforge.com/minecraft/modpacks/capital-industries-server">CurseForge</a>
-        <a href="https://www.modpackindex.com/modpack/117341/capital-industries-server">Modpack Index</a>
       </nav>
-    </div>
-  </footer>
+    </header>
+
+    <main>
+      <section class="page-hero container reveal">
+        <p class="kicker">BlueMap</p>
+        <h1 class="page-title">Open the <span class="accent">live world map.</span></h1>
+        <p class="page-lead">
+          Use the map to inspect terrain, public builds, routes, infrastructure, and world activity.
+        </p>
+        <div class="action-row">
+          <a class="button button-primary" href="https://map.capitalindustries.net">
+            <img class="button-icon" src="/assets/brand/bluemap-logo.png" alt="">
+            Open BlueMap
+          </a>
+          <a class="button" href="/download">Download Launcher</a>
+          <a class="button" href="https://discord.gg/jj7fFEYYfk">Discord</a>
+        </div>
+      </section>
+
+      <section class="section container">
+        <div class="map-panel reveal">
+          <div>
+            <h2 class="section-title">Map route</h2>
+            <p class="section-copy">
+              The site is ready for a dedicated BlueMap subdomain. When the map DNS or proxy is connected,
+              this button will take players directly to the live map.
+            </p>
+          </div>
+          <div class="map-logo" aria-hidden="true"><img src="/assets/brand/bluemap-logo.png" alt=""></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer"><div class="footer-inner container"><span>Capital Industries · Season 3</span><div class="footer-links"><a href="/">Home</a><a href="/store">Store</a><a href="/download">Launcher</a></div></div></footer>
+  </div>
   <script src="/assets/site.js" defer></script>
 </body>
 </html>

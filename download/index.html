@@ -4,99 +4,74 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Download Launcher | Capital Industries</title>
-  <meta
-    name="description"
-    content="Download the Capital Industries custom launcher for the modded Minecraft server."
-  >
-
+  <meta name="description" content="Download the Capital Industries launcher for the Season 3 modded Minecraft server.">
   <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
-  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" href="/favicon-32.png" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
-  <meta name="theme-color" content="#ff8a18">
   <link rel="stylesheet" href="/assets/site.css">
 </head>
-
 <body>
-
-  <header class="site-header">
-    <div class="site-shell navbar">
-      <a class="brand" href="/" aria-label="Capital Industries home">
-        <img class="brand-icon" src="/assets/brand/server-icon.png" alt="" width="40" height="40">
-        <span class="brand-text">
-          <span class="brand-title">Capital Industries</span>
-          <span class="brand-subtitle">Modded Server</span>
-        </span>
-      </a>
-
-      <nav class="nav-links" aria-label="Primary navigation">
-        <a class="nav-link" href="/download">Download</a>
-        <a class="nav-link" href="/store">Store</a>
-        <a class="nav-link" href="/map">Map</a>
-        <a class="nav-link" href="https://discord.gg/jj7fFEYYfk">Discord</a>
-        <a class="nav-link nav-link-cta" href="/download">Play</a>
-      </nav>
-    </div>
-  </header>
-
-  <main>
-    <section class="site-shell hero hero-compact">
-      <div>
-        <p class="eyebrow">Capital Industries Launcher</p>
-        <h1 class="page-title">Download <span class="accent">Launcher</span></h1>
-        <p class="tagline">
-          Use the custom CCI Launcher for the intended install path. Until the
-          executable is uploaded, players can use the CurseForge page or join
-          Discord for setup help.
-        </p>
-      </div>
-    </section>
-
-    <section class="site-shell section">
-      <div class="panel download-card">
-        <span class="status-pill">Windows Launcher</span>
-        <h2 class="section-title" style="margin-top: 18px;">One-click setup path.</h2>
-        <p class="section-text">
-          Drop the launcher file at <code>/downloads/CCI-Launcher.exe</code>.
-        </p>
-
-        <div class="actions">
-          <a
-            class="button button-primary"
-            href="/downloads/CCI-Launcher.exe"
-            download
-            data-check-download
-            data-unavailable-text="Launcher Coming Soon"
-          >Download Windows Launcher</a>
-          <a class="button" href="https://www.curseforge.com/minecraft/modpacks/capital-industries-server">CurseForge Fallback</a>
-          <a class="button button-ghost" href="https://discord.gg/jj7fFEYYfk">Discord Help</a>
+  <div class="site-shell">
+    <header class="site-header">
+      <nav class="navbar container" aria-label="Primary navigation">
+        <a class="brand-link" href="/">
+          <img class="brand-mark" src="/assets/brand/server-logo-320.png" alt="">
+          <span class="brand-copy"><span class="brand-title">Capital Industries</span><span class="brand-subtitle">Season 3</span></span>
+        </a>
+        <div class="nav-links">
+          <a class="nav-link" aria-current="page" href="/download">Launcher</a>
+          <a class="nav-link" href="/store">Store</a>
+          <a class="nav-link" href="/map">Map</a>
+          <a class="nav-link" href="https://discord.gg/jj7fFEYYfk">Discord</a>
         </div>
-
-        <div class="copy-line" aria-label="Server address">
-          <span class="copy-value">play.capitalindustries.net</span>
-          <button
-            class="button copy-button"
-            type="button"
-            data-copy-value="play.capitalindustries.net"
-          >Copy Server Address</button>
-        </div>
-      </div>
-    </section>
-  </main>
-
-
-  <footer class="footer">
-    <div class="site-shell footer-inner">
-      <span>Capital Industries · Modded Minecraft Server</span>
-      <nav class="footer-links" aria-label="Footer links">
-        <a href="/download">Launcher</a>
-        <a href="/store">Ranks</a>
-        <a href="/map">Live Map</a>
-        <a href="https://www.curseforge.com/minecraft/modpacks/capital-industries-server">CurseForge</a>
-        <a href="https://www.modpackindex.com/modpack/117341/capital-industries-server">Modpack Index</a>
       </nav>
-    </div>
-  </footer>
+    </header>
+
+    <main>
+      <section class="page-hero container reveal">
+        <p class="kicker"><span class="status-dot"></span> Launcher</p>
+        <h1 class="page-title">Download the <span class="accent">CCI Launcher.</span></h1>
+        <p class="page-lead">
+          The launcher is intended to be the clean install path for Season 3. Until the EXE is uploaded,
+          CurseForge and Modpack Index remain available as fallback installation paths.
+        </p>
+        <div class="action-row">
+          <a class="button button-primary" href="/downloads/CCI-Launcher.exe" download data-launcher-link>
+            Download Windows Launcher
+          </a>
+          <a class="button" href="https://www.curseforge.com/minecraft/modpacks/capital-industries-server">CurseForge</a>
+          <a class="button" href="https://www.modpackindex.com/modpack/117341/capital-industries-server">Modpack Index</a>
+        </div>
+      </section>
+
+      <section class="section container">
+        <div class="download-panel">
+          <article class="install-card reveal">
+            <h2>Install path</h2>
+            <p class="section-copy">Use the launcher when available. Manual mirrors are still useful as backup options.</p>
+            <ol class="steps">
+              <li>Download the launcher or install the pack from a mirror.</li>
+              <li>Join the Discord for updates, support, and server announcements.</li>
+              <li>Launch the pack and connect to the server from Multiplayer.</li>
+            </ol>
+          </article>
+
+          <aside class="status-card reveal">
+            <h2>Server</h2>
+            <p class="section-copy">The address is available for manual entry, but most players should use the launcher flow.</p>
+            <button class="button" type="button" data-copy="play.capitalindustries.net">Copy server address</button>
+            <div class="action-row">
+              <a class="button" href="https://discord.gg/jj7fFEYYfk">Discord Help</a>
+              <a class="button" href="/map">World Map</a>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer"><div class="footer-inner container"><span>Capital Industries · Season 3</span><div class="footer-links"><a href="/">Home</a><a href="/store">Store</a><a href="/map">Map</a></div></div></footer>
+  </div>
   <script src="/assets/site.js" defer></script>
 </body>
 </html>

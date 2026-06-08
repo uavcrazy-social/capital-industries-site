@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title">
+  <title>Factory</title>
+  <path d="M13 77V43l18 10V43l18 10V34h34v43H13Z" fill="#ff8a18" opacity=".14"/>
+  <path d="M14 77V43l18 10V43l18 10V34h33v43H14Z" fill="none" stroke="#ff9f2f" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M23 64h12m10 0h12m10 0h8" stroke="#ff9f2f" stroke-width="6" stroke-linecap="round"/>
+</svg>

@@ -1,21 +1,19 @@
 {
   "name": "Capital Industries",
   "short_name": "Capital Industries",
-  "description": "Capital Industries modded Minecraft server.",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#08090c",
-  "theme_color": "#ff8a18",
   "icons": [
     {
-      "src": "/assets/icons/icon-192.png",
+      "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/assets/icons/icon-512.png",
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "theme_color": "#ff8a18",
+  "background_color": "#090a0d",
+  "display": "standalone"
 }

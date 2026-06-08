@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title">
+  <title>Claims</title>
+  <path d="M48 10 78 24v21c0 19-11 32-30 41-19-9-30-22-30-41V24l30-14Z" fill="#ff8a18" opacity=".14"/>
+  <path d="M48 10 78 24v21c0 19-11 32-30 41-19-9-30-22-30-41V24l30-14Z" fill="none" stroke="#ff9f2f" stroke-width="6" stroke-linejoin="round"/>
+  <path d="m34 48 10 10 19-22" fill="none" stroke="#ff9f2f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
