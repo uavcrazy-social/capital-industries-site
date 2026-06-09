@@ -4,7 +4,8 @@
   var USERNAME_PATTERN = /^[A-Za-z0-9_]{3,16}$/;
   var MIN_PASSWORD_LENGTH = 12;
   var MAX_PASSWORD_LENGTH = 128;
-  var API_UNAVAILABLE_MESSAGE = "Account access is temporarily unavailable. Try again later or contact Discord support.";
+  var API_UNAVAILABLE_MESSAGE = "Account request failed. Try again later or contact Discord support.";
+  var API_BASE = String(window.CAPITAL_INDUSTRIES_ACCOUNT_API_BASE || "").replace(/\/$/, "");
 
   function byId(id) {
     return document.getElementById(id);
@@ -55,13 +56,17 @@
     return contentType.toLowerCase().indexOf("application/json") !== -1;
   }
 
+  function getApiUrl(path) {
+    return API_BASE + path;
+  }
+
   async function requestJson(path, options) {
     var response;
     var payload;
 
     try {
-      response = await fetch(path, Object.assign({
-        credentials: "same-origin",
+      response = await fetch(getApiUrl(path), Object.assign({
+        credentials: API_BASE ? "include" : "same-origin",
         headers: {
           "Content-Type": "application/json"
         }
@@ -157,7 +162,9 @@
     }
   }
 
-  async function refreshSession() {
+  async function refreshSession(options) {
+    var silent = Boolean(options && options.silent);
+
     try {
       var payload = await requestJson("/api/auth/me", { method: "GET", headers: {} });
 
@@ -170,7 +177,9 @@
 
       renderSignedOut();
     } catch (error) {
-      setApiWarning(error.message === API_UNAVAILABLE_MESSAGE);
+      if (!silent) {
+        setApiWarning(error.message === API_UNAVAILABLE_MESSAGE);
+      }
       renderSignedOut();
     }
   }
@@ -371,5 +380,5 @@
   }
 
   bindEvents();
-  refreshSession();
+  refreshSession({ silent: true });
 }());
