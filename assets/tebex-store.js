@@ -2,12 +2,10 @@
   "use strict";
 
   /**
-   * Fill these from Tebex Control Panel.
-   * Public token and package IDs are public identifiers. Do not put a private
-   * key, secret key, webhook secret, or API secret in this browser file.
+   * Public Tebex identifiers only. Do not put a private key, secret key,
+   * webhook secret, or admin API secret in this browser file.
    */
-  // Set to true to re-enable Member, Premium, and Elite checkout buttons.
-  var RANK_PURCHASES_ENABLED = false;
+  var RANK_PURCHASES_ENABLED = true;
 
   var TEBEX_PUBLIC_TOKEN = "13bmd-225b100e916451ed82c9e96183f8929d044f437c";
   var PACKAGE_IDS = {
@@ -18,6 +16,8 @@
 
   var USERNAME_PATTERN = /^[A-Za-z0-9_]{3,16}$/;
   var HEADLESS_API_BASE = "https://headless.tebex.io/api";
+  var MINECRAFT_SERVICES_PROFILE_URL = "https://api.minecraftservices.com/minecraft/profile/lookup/name/";
+  var MOJANG_PROFILE_URL = "https://api.mojang.com/users/profiles/minecraft/";
   var PACKAGE_DISPLAY = {
     member: {
       name: "Member",
@@ -33,13 +33,26 @@
     }
   };
   var MODAL_CLOSE_DELAY_MS = 190;
+  var USERNAME_LOOKUP_DEBOUNCE_MS = 450;
   var pendingPackageKey = "";
   var pendingTrigger = null;
   var checkoutBusy = false;
   var closeTimer = 0;
+  var lookupTimer = 0;
+  var lookupSequence = 0;
+  var lookupState = {
+    input: "",
+    status: "idle",
+    profile: null,
+    error: ""
+  };
 
   function getStatusElement() {
     return document.getElementById("checkout-status");
+  }
+
+  function getLookupElement() {
+    return document.getElementById("username-lookup-result");
   }
 
   function setStatus(message) {
@@ -48,6 +61,17 @@
     if (status) {
       status.textContent = message;
     }
+  }
+
+  function setLookupMessage(message, state) {
+    var result = getLookupElement();
+
+    if (!result) {
+      return;
+    }
+
+    result.textContent = message;
+    result.setAttribute("data-state", state || "idle");
   }
 
   function getModal() {
@@ -74,6 +98,18 @@
     }
 
     return input.value.trim();
+  }
+
+  function normalizeUsername(username) {
+    return String(username || "").trim().toLowerCase();
+  }
+
+  function getVerifiedUsername() {
+    if (lookupState.profile && lookupState.profile.name) {
+      return lookupState.profile.name;
+    }
+
+    return getUsername();
   }
 
   function getStoredUsername() {
@@ -130,9 +166,21 @@
     var buttons = document.querySelectorAll("[data-tebex-package]");
 
     buttons.forEach(function (button) {
-      button.disabled = disabled;
+      button.disabled = disabled || !RANK_PURCHASES_ENABLED;
       button.setAttribute("aria-busy", disabled ? "true" : "false");
     });
+  }
+
+  function resetLookupState() {
+    lookupSequence += 1;
+    lookupState = {
+      input: "",
+      status: "idle",
+      profile: null,
+      error: ""
+    };
+    window.clearTimeout(lookupTimer);
+    setLookupMessage("", "idle");
   }
 
   function setModalBusy(disabled) {
@@ -140,7 +188,6 @@
     var dismissers = modal ? modal.querySelectorAll("[data-modal-dismiss]") : [];
     var continueButton = getContinueButton();
     var input = getUsernameInput();
-    var checkbox = getConfirmCheckbox();
 
     checkoutBusy = disabled;
 
@@ -153,15 +200,22 @@
       input.disabled = disabled;
     }
 
-    if (checkbox) {
-      checkbox.disabled = disabled;
-    }
-
     if (continueButton) {
       continueButton.setAttribute("aria-busy", disabled ? "true" : "false");
     }
 
     updateConfirmState();
+  }
+
+  function isLookupConfirmedFor(username) {
+    var profile = lookupState.profile;
+
+    if (!profile || lookupState.status !== "found") {
+      return false;
+    }
+
+    return normalizeUsername(profile.name) === normalizeUsername(username) &&
+      normalizeUsername(lookupState.input) === normalizeUsername(username);
   }
 
   function updateConfirmState() {
@@ -170,15 +224,207 @@
     var continueButton = getContinueButton();
     var preview = document.getElementById("username-preview");
     var validUsername = USERNAME_PATTERN.test(username);
+    var verified = validUsername && isLookupConfirmedFor(username);
     var confirmed = Boolean(checkbox && checkbox.checked);
 
     if (preview) {
-      preview.textContent = username || "this username";
+      preview.textContent = verified ? getVerifiedUsername() : username || "this username";
+    }
+
+    if (checkbox) {
+      checkbox.disabled = checkoutBusy || !verified;
     }
 
     if (continueButton) {
-      continueButton.disabled = checkoutBusy || !validUsername || !confirmed;
+      continueButton.disabled = checkoutBusy || !validUsername || !verified || !confirmed;
     }
+  }
+
+  function applyProfileResult(username, profile) {
+    var canonicalName = profile && profile.name ? profile.name : username;
+
+    lookupState = {
+      input: username,
+      status: "found",
+      profile: {
+        id: String(profile && profile.id ? profile.id : ""),
+        name: canonicalName
+      },
+      error: ""
+    };
+
+    setLookupMessage("Found current Java username: " + canonicalName + ".", "success");
+    updateConfirmState();
+  }
+
+  function applyProfileMissing(username) {
+    lookupState = {
+      input: username,
+      status: "missing",
+      profile: null,
+      error: "not-found"
+    };
+
+    setLookupMessage("No current Minecraft Java profile was found for " + username + ".", "error");
+    updateConfirmState();
+  }
+
+  function applyProfileError(username, message) {
+    lookupState = {
+      input: username,
+      status: "error",
+      profile: null,
+      error: message || "lookup-failed"
+    };
+
+    setLookupMessage(
+      "Username lookup failed. Check the name or try again before checkout.",
+      "error"
+    );
+    updateConfirmState();
+  }
+
+  async function fetchProfile(url) {
+    var response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json"
+      }
+    });
+
+    if (response.status === 204 || response.status === 404) {
+      return null;
+    }
+
+    if (!response.ok) {
+      throw new Error("Profile lookup failed with HTTP " + response.status + ".");
+    }
+
+    return response.json();
+  }
+
+  async function lookupMinecraftProfile(username) {
+    var encodedUsername = encodeURIComponent(username);
+    var lastError = null;
+    var profile = null;
+
+    try {
+      profile = await fetchProfile(MINECRAFT_SERVICES_PROFILE_URL + encodedUsername);
+    } catch (error) {
+      lastError = error;
+    }
+
+    if (profile && normalizeUsername(profile.name) === normalizeUsername(username)) {
+      return profile;
+    }
+
+    try {
+      profile = await fetchProfile(MOJANG_PROFILE_URL + encodedUsername);
+    } catch (error) {
+      lastError = error;
+    }
+
+    if (profile && normalizeUsername(profile.name) === normalizeUsername(username)) {
+      return profile;
+    }
+
+    if (lastError && !profile) {
+      throw lastError;
+    }
+
+    return null;
+  }
+
+  async function verifyUsernameNow(username) {
+    var sequence = ++lookupSequence;
+
+    window.clearTimeout(lookupTimer);
+
+    if (!USERNAME_PATTERN.test(username)) {
+      resetLookupState();
+      setLookupMessage(
+        username ? "Use 3-16 letters, numbers, or underscores." : "",
+        username ? "error" : "idle"
+      );
+      updateConfirmState();
+      return false;
+    }
+
+    lookupState = {
+      input: username,
+      status: "checking",
+      profile: null,
+      error: ""
+    };
+    setLookupMessage("Checking Mojang profile lookup...", "checking");
+    updateConfirmState();
+
+    try {
+      var profile = await lookupMinecraftProfile(username);
+
+      if (sequence !== lookupSequence) {
+        return false;
+      }
+
+      if (!profile) {
+        applyProfileMissing(username);
+        return false;
+      }
+
+      applyProfileResult(username, profile);
+      return true;
+    } catch (error) {
+      if (sequence !== lookupSequence) {
+        return false;
+      }
+
+      console.error(error);
+      applyProfileError(username, error.message);
+      return false;
+    }
+  }
+
+  function scheduleUsernameLookup() {
+    lookupSequence += 1;
+    var username = getUsername();
+    var checkbox = getConfirmCheckbox();
+
+    if (checkbox) {
+      checkbox.checked = false;
+    }
+
+    window.clearTimeout(lookupTimer);
+
+    if (!username) {
+      resetLookupState();
+      updateConfirmState();
+      return;
+    }
+
+    if (!USERNAME_PATTERN.test(username)) {
+      lookupState = {
+        input: username,
+        status: "invalid",
+        profile: null,
+        error: "invalid-format"
+      };
+      setLookupMessage("Use 3-16 letters, numbers, or underscores.", "error");
+      updateConfirmState();
+      return;
+    }
+
+    lookupState = {
+      input: username,
+      status: "queued",
+      profile: null,
+      error: ""
+    };
+    setLookupMessage("Ready to check username...", "checking");
+    updateConfirmState();
+
+    lookupTimer = window.setTimeout(function () {
+      verifyUsernameNow(username);
+    }, USERNAME_LOOKUP_DEBOUNCE_MS);
   }
 
   function openUsernameModal(packageKey, trigger) {
@@ -209,6 +455,7 @@
     input.value = getStoredUsername();
     checkbox.checked = false;
     setStatus("");
+    resetLookupState();
     setModalBusy(false);
 
     modal.hidden = false;
@@ -222,6 +469,7 @@
     window.setTimeout(function () {
       input.focus();
       input.select();
+      scheduleUsernameLookup();
     }, 90);
   }
 
@@ -235,10 +483,12 @@
     modal.classList.remove("is-open");
     modal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("modal-open");
+    window.clearTimeout(lookupTimer);
 
     closeTimer = window.setTimeout(function () {
       modal.hidden = true;
       setStatus("");
+      resetLookupState();
 
       if (pendingTrigger && typeof pendingTrigger.focus === "function") {
         pendingTrigger.focus();
@@ -278,7 +528,9 @@
           cancel_url: getReturnUrl("cancelled"),
           complete_auto_redirect: true,
           custom: {
-            source: "capital-industries-store"
+            source: "capital-industries-store",
+            minecraft_uuid: lookupState.profile && lookupState.profile.id ? lookupState.profile.id : "",
+            minecraft_username: username
           }
         })
       }
@@ -423,7 +675,7 @@
     }
   }
 
-  function handleConfirmClick() {
+  async function handleConfirmClick() {
     var username = getUsername();
 
     if (!USERNAME_PATTERN.test(username)) {
@@ -432,12 +684,21 @@
       return;
     }
 
+    if (!isLookupConfirmedFor(username)) {
+      setStatus("Verifying Minecraft username before checkout...");
+
+      if (!await verifyUsernameNow(username)) {
+        setStatus("Username must be verified before checkout.");
+        return;
+      }
+    }
+
     if (!pendingPackageKey) {
       setStatus("Select a rank before continuing.");
       return;
     }
 
-    beginCheckout(pendingPackageKey, username);
+    beginCheckout(pendingPackageKey, getVerifiedUsername());
   }
 
   function initializeCheckoutButtons() {
@@ -458,11 +719,8 @@
 
     if (input) {
       input.addEventListener("input", function () {
-        if (checkbox) {
-          checkbox.checked = false;
-        }
         setStatus("");
-        updateConfirmState();
+        scheduleUsernameLookup();
       });
 
       input.addEventListener("keydown", function (event) {
