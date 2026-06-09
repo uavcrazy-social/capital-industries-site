@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>Account | Capital Industries</title>
-<meta content="Create or manage a Capital Industries website account with a Minecraft username and password." name="description"/>
+<meta content="Continue with Google or Discord and link your Minecraft username for Capital Industries store access." name="description"/>
 <link href="/favicon.ico" rel="icon" sizes="any"/>
 <link href="/assets/icons/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
 <link href="/assets/icons/apple-touch-icon.png" rel="apple-touch-icon"/>
@@ -42,16 +42,47 @@
 <p class="eyebrow">Capital Industries Account</p>
 <h1 class="page-title">Manage <span class="accent">access</span></h1>
 <p class="tagline">
-Create or sign in using your current Minecraft Java username and password.
+Continue with Google or Discord, then confirm your current Minecraft Java username for store checkout.
 </p>
 </div>
 </section>
 <section class="site-shell section">
 <div class="notice account-service-warning" hidden id="account-service-warning" data-reveal="">
-Account request failed. Try again later or contact Discord support.
+Account services are not available right now.
 </div>
 <div class="account-grid" data-reveal="">
-<article class="panel account-panel" id="account-session-panel" hidden>
+<article class="panel account-panel" id="auth-panel">
+<h2 class="link-title">Account access</h2>
+<p class="link-text">Public login is Google or Discord only.</p>
+<div class="account-oauth-actions">
+<button class="button button-primary oauth-button oauth-google" id="google-sign-in" type="button">
+Continue with Google
+</button>
+<button class="button oauth-button oauth-discord" id="discord-sign-in" type="button">
+Continue with Discord
+</button>
+</div>
+<p aria-live="polite" class="account-status" id="auth-status"></p>
+</article>
+<article class="panel account-panel" hidden id="onboarding-panel">
+<h2 class="link-title">Link Minecraft username</h2>
+<p class="link-text" id="onboarding-summary">Confirm your current in-game name before buying ranks.</p>
+<form class="account-form" id="onboarding-form" novalidate>
+<label class="store-label" for="onboarding-username">Minecraft Java username</label>
+<input autocomplete="username" class="store-input" id="onboarding-username" maxlength="16" name="minecraftUsername" placeholder="Example: Steve" required type="text"/>
+<p aria-live="polite" class="username-lookup" id="onboarding-username-lookup"></p>
+<label class="confirm-check" for="onboarding-username-confirmed">
+<input id="onboarding-username-confirmed" type="checkbox"/>
+<span>
+I confirm <strong id="onboarding-username-preview">this username</strong> is my current in-game name.
+If it is wrong, ranks may not apply correctly.
+</span>
+</label>
+<button class="button button-primary" disabled id="onboarding-submit" type="submit">Save and continue</button>
+<p aria-live="polite" class="account-status" id="onboarding-status"></p>
+</form>
+</article>
+<article class="panel account-panel" hidden id="account-session-panel">
 <div class="account-panel-header">
 <div>
 <p class="eyebrow">Signed in</p>
@@ -60,67 +91,36 @@ Account request failed. Try again later or contact Discord support.
 </div>
 <button class="button button-ghost" id="logout-button" type="button">Sign out</button>
 </div>
-<form class="account-form" id="profile-form" novalidate>
-<h3 class="account-subtitle">Minecraft username</h3>
-<label class="store-label" for="profile-minecraft-username">Current Java username</label>
-<input autocomplete="username" class="store-input" id="profile-minecraft-username" maxlength="16" name="minecraftUsername" pattern="[A-Za-z0-9_]{3,16}" required type="text"/>
-<label class="confirm-check" for="profile-username-confirmed">
-<input id="profile-username-confirmed" required type="checkbox"/>
-<span>I confirm this is my exact current in-game name. If it is wrong, rank delivery may not apply correctly.</span>
-</label>
-<button class="button button-primary" type="submit">Save username</button>
-<p aria-live="polite" class="checkout-status" id="profile-status"></p>
-</form>
-<form class="account-form" id="password-form" novalidate>
-<h3 class="account-subtitle">Password</h3>
-<label class="store-label" for="current-password">Current password</label>
-<input autocomplete="current-password" class="store-input" id="current-password" maxlength="128" name="currentPassword" required type="password"/>
-<label class="store-label" for="new-password">New password</label>
-<input autocomplete="new-password" class="store-input" id="new-password" maxlength="128" minlength="12" name="newPassword" required type="password"/>
-<p class="username-help">Use at least 12 characters.</p>
-<button class="button button-primary" type="submit">Change password</button>
-<p aria-live="polite" class="checkout-status" id="password-status"></p>
-</form>
-</article>
-<article class="panel account-panel" id="auth-panel">
-<div class="account-tabs" role="tablist" aria-label="Account access mode">
-<button aria-controls="register-panel" aria-selected="true" class="account-tab is-active" data-account-tab="register" id="register-tab" role="tab" type="button">Create account</button>
-<button aria-controls="login-panel" aria-selected="false" class="account-tab" data-account-tab="login" id="login-tab" role="tab" type="button">Sign in</button>
+<div class="account-meta">
+<div class="account-meta-row">
+<span class="account-meta-label">Linked in-game name</span>
+<span class="account-meta-value" id="account-linked-username">—</span>
 </div>
-<form aria-labelledby="register-tab" class="account-form" id="register-form" role="tabpanel" novalidate>
-<h2 class="link-title">Create account</h2>
-<p class="link-text">Use your current Minecraft Java username.</p>
-<label class="store-label" for="register-minecraft-username">Minecraft Java username</label>
-<input autocomplete="username" class="store-input" id="register-minecraft-username" maxlength="16" name="minecraftUsername" pattern="[A-Za-z0-9_]{3,16}" placeholder="Example: Steve" required type="text"/>
-<label class="store-label" for="register-password">Password</label>
-<input autocomplete="new-password" class="store-input" id="register-password" maxlength="128" minlength="12" name="password" required type="password"/>
-<label class="store-label" for="register-password-confirm">Confirm password</label>
-<input autocomplete="new-password" class="store-input" id="register-password-confirm" maxlength="128" minlength="12" name="passwordConfirm" required type="password"/>
-<label class="confirm-check" for="register-username-confirmed">
-<input id="register-username-confirmed" required type="checkbox"/>
-<span>I confirm this is my exact current in-game name.</span>
+</div>
+<form class="account-form" id="profile-form" novalidate>
+<h3 class="account-subtitle">Update in-game username</h3>
+<label class="store-label" for="profile-minecraft-username">Minecraft Java username</label>
+<input autocomplete="username" class="store-input" id="profile-minecraft-username" maxlength="16" name="minecraftUsername" required type="text"/>
+<p aria-live="polite" class="username-lookup" id="profile-username-lookup"></p>
+<label class="confirm-check" for="profile-username-confirmed">
+<input id="profile-username-confirmed" type="checkbox"/>
+<span>
+I confirm <strong id="profile-username-preview">this username</strong> is my current in-game name.
+</span>
 </label>
-<button class="button button-primary" type="submit">Create account</button>
-<p aria-live="polite" class="checkout-status" id="register-status"></p>
+<button class="button button-primary" disabled id="profile-submit" type="submit">Save username</button>
+<p aria-live="polite" class="account-status" id="profile-status"></p>
 </form>
-<form aria-labelledby="login-tab" class="account-form" hidden id="login-form" role="tabpanel" novalidate>
-<h2 class="link-title">Sign in</h2>
-<p class="link-text">Use the Minecraft username and password created here.</p>
-<label class="store-label" for="login-minecraft-username">Minecraft Java username</label>
-<input autocomplete="username" class="store-input" id="login-minecraft-username" maxlength="16" name="minecraftUsername" required type="text"/>
-<label class="store-label" for="login-password">Password</label>
-<input autocomplete="current-password" class="store-input" id="login-password" maxlength="128" name="password" required type="password"/>
-<button class="button button-primary" type="submit">Sign in</button>
-<p aria-live="polite" class="checkout-status" id="login-status"></p>
-</form>
+<a class="button button-primary" href="/store/">Go to store</a>
 </article>
 <aside class="panel account-panel account-secondary">
 <p class="eyebrow">Account help</p>
-<h2 class="link-title">Use one exact Java name</h2>
+<h2 class="link-title">One exact Java name</h2>
 <ul class="perk-list">
-<li>Your account name should match your current in-game name.</li>
-<li>Ranks are still purchased through the store.</li>
-<li>For account help, contact support in Discord.</li>
+<li>Continue with Google or Discord to access your account.</li>
+<li>We verify your username exists via Mojang before saving it.</li>
+<li>Ranks are purchased on the store after your username is linked.</li>
+<li>For help, contact support in Discord.</li>
 </ul>
 <a class="button button-ghost" href="/store">Go to ranks</a>
 </aside>
@@ -141,7 +141,8 @@ Account request failed. Try again later or contact Discord support.
 </nav>
 </div>
 </footer>
-<script defer src="/assets/account.js"></script>
+<script src="/assets/supabase-config.js"></script>
+<script type="module" src="/assets/account.js"></script>
 <script defer src="/assets/site.js"></script>
 </body>
 </html>

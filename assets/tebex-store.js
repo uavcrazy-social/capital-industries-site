@@ -36,10 +36,6 @@
     return document.getElementById("checkout-status");
   }
 
-  function getLookupElement() {
-    return document.getElementById("username-lookup-result");
-  }
-
   function setStatus(message) {
     var status = getStatusElement();
 
@@ -48,23 +44,8 @@
     }
   }
 
-  function setLookupMessage(message, state) {
-    var result = getLookupElement();
-
-    if (!result) {
-      return;
-    }
-
-    result.textContent = message;
-    result.setAttribute("data-state", state || "idle");
-  }
-
   function getModal() {
     return document.getElementById("checkout-identity-modal");
-  }
-
-  function getUsernameInput() {
-    return document.getElementById("minecraft-username");
   }
 
   function getConfirmCheckbox() {
@@ -75,29 +56,52 @@
     return document.getElementById("checkout-continue");
   }
 
+  var linkedUsername = "";
+
+  function waitForAuth() {
+    return new Promise(function (resolve) {
+      function check() {
+        if (window.CapitalAuth && window.CapitalAuth.ready) {
+          window.CapitalAuth.ready().then(resolve);
+          return;
+        }
+
+        window.setTimeout(check, 40);
+      }
+
+      check();
+    });
+  }
+
+  function setAuthNoticeVisible(visible) {
+    var notice = document.getElementById("store-auth-notice");
+
+    if (notice) {
+      notice.hidden = !visible;
+    }
+  }
+
+  async function refreshStoreAccess() {
+    await waitForAuth();
+
+    if (!window.CapitalAuth || !window.CapitalAuth.configured) {
+      setAuthNoticeVisible(true);
+      setButtonState(true);
+      linkedUsername = "";
+      return;
+    }
+
+    var loggedIn = await window.CapitalAuth.isLoggedIn();
+    var complete = loggedIn && await window.CapitalAuth.hasCompleteProfile();
+
+    linkedUsername = complete ? await window.CapitalAuth.getMinecraftUsername() : "";
+    setAuthNoticeVisible(!complete);
+    setButtonState(false);
+    updateConfirmState();
+  }
+
   function getUsername() {
-    var input = getUsernameInput();
-
-    if (!input) {
-      return "";
-    }
-
-    return input.value.trim();
-  }
-
-  function getStoredUsername() {
-    try {
-      return window.localStorage.getItem("capital-industries-minecraft-username") || "";
-    } catch (error) {
-      return "";
-    }
-  }
-
-  function storeUsername(username) {
-    try {
-      window.localStorage.setItem("capital-industries-minecraft-username", username);
-    } catch (error) {
-    }
+    return linkedUsername;
   }
 
   function getCheckoutUrl(path) {
@@ -147,7 +151,7 @@
     var modal = getModal();
     var dismissers = modal ? modal.querySelectorAll("[data-modal-dismiss]") : [];
     var continueButton = getContinueButton();
-    var input = getUsernameInput();
+    var checkbox = getConfirmCheckbox();
 
     checkoutBusy = disabled;
 
@@ -156,8 +160,8 @@
       button.setAttribute("aria-disabled", disabled ? "true" : "false");
     });
 
-    if (input) {
-      input.disabled = disabled;
+    if (checkbox) {
+      checkbox.disabled = disabled;
     }
 
     if (continueButton) {
@@ -172,6 +176,7 @@
     var checkbox = getConfirmCheckbox();
     var continueButton = getContinueButton();
     var preview = document.getElementById("username-preview");
+    var linkedLabel = document.getElementById("checkout-linked-username");
     var validUsername = USERNAME_PATTERN.test(username);
     var confirmed = Boolean(checkbox && checkbox.checked);
 
@@ -179,12 +184,12 @@
       preview.textContent = username || "this username";
     }
 
-    if (checkbox) {
-      checkbox.disabled = checkoutBusy || !validUsername;
+    if (linkedLabel) {
+      linkedLabel.textContent = username || "your player";
+    }
 
-      if (!validUsername) {
-        checkbox.checked = false;
-      }
+    if (checkbox && !validUsername) {
+      checkbox.checked = false;
     }
 
     if (continueButton) {
@@ -192,38 +197,14 @@
     }
   }
 
-  function validateUsernameInput() {
-    var username = getUsername();
-
-    if (!username) {
-      setLookupMessage("", "idle");
-      updateConfirmState();
-      return false;
-    }
-
-    if (!USERNAME_PATTERN.test(username)) {
-      setLookupMessage("Use 3-16 letters, numbers, or underscores.", "error");
-      updateConfirmState();
-      return false;
-    }
-
-    setLookupMessage(
-      "Confirm this is your exact current Java username before checkout.",
-      "success"
-    );
-    updateConfirmState();
-    return true;
-  }
-
   function openUsernameModal(packageKey, trigger) {
     var modal = getModal();
-    var input = getUsernameInput();
     var checkbox = getConfirmCheckbox();
     var packageName = document.getElementById("checkout-package-name");
     var packagePrice = document.getElementById("checkout-package-price");
     var display = PACKAGE_DISPLAY[packageKey] || { name: "this rank", price: "" };
 
-    if (!modal || !input || !checkbox) {
+    if (!modal || !checkbox) {
       setStatus("Checkout dialog could not be opened.");
       return;
     }
@@ -240,10 +221,8 @@
       packagePrice.textContent = display.price ? "(" + display.price + ")" : "";
     }
 
-    input.value = getStoredUsername();
     checkbox.checked = false;
     setStatus("");
-    setLookupMessage("", "idle");
     setModalBusy(false);
 
     modal.hidden = false;
@@ -254,11 +233,7 @@
       modal.classList.add("is-open");
     });
 
-    window.setTimeout(function () {
-      input.focus();
-      input.select();
-      validateUsernameInput();
-    }, 90);
+    updateConfirmState();
   }
 
   function closeUsernameModal(force) {
@@ -275,7 +250,6 @@
     closeTimer = window.setTimeout(function () {
       modal.hidden = true;
       setStatus("");
-      setLookupMessage("", "idle");
 
       if (pendingTrigger && typeof pendingTrigger.focus === "function") {
         pendingTrigger.focus();
@@ -419,7 +393,6 @@
       var checkoutIdent = checkoutBasket.ident || basket.ident;
 
       setStatus("Opening checkout...");
-      storeUsername(username);
       launchCheckout(checkoutIdent);
       closeUsernameModal(true);
     } catch (error) {
@@ -442,15 +415,43 @@
       setStatus(error.message || "Unable to open Tebex checkout.");
     } finally {
       setModalBusy(false);
-      setButtonState(false);
+      refreshStoreAccess();
     }
   }
 
-  function handleBuyClick(event) {
+  function redirectToAccount(setup) {
+    var url = "/account/?return=" + encodeURIComponent("/store/");
+
+    if (setup) {
+      url += "&setup=1";
+    }
+
+    window.location.href = url;
+  }
+
+  async function handleBuyClick(event) {
     if (!RANK_PURCHASES_ENABLED) {
       return;
     }
 
+    await waitForAuth();
+
+    if (!window.CapitalAuth || !window.CapitalAuth.configured) {
+      setStatus("Account sign-in is not configured yet.");
+      return;
+    }
+
+    if (!await window.CapitalAuth.isLoggedIn()) {
+      redirectToAccount(false);
+      return;
+    }
+
+    if (!await window.CapitalAuth.hasCompleteProfile()) {
+      redirectToAccount(true);
+      return;
+    }
+
+    linkedUsername = await window.CapitalAuth.getMinecraftUsername();
     var packageKey = event.currentTarget.getAttribute("data-tebex-package");
 
     try {
@@ -467,7 +468,7 @@
     var username = getUsername();
 
     if (!USERNAME_PATTERN.test(username)) {
-      setStatus("Enter a valid Java username: 3-16 letters, numbers, or underscores.");
+      setStatus("Link a valid Java username on your account page before checkout.");
       updateConfirmState();
       return;
     }
@@ -489,35 +490,14 @@
   function initializeCheckoutButtons() {
     var buttons = document.querySelectorAll("[data-tebex-package]");
     var modal = getModal();
-    var input = getUsernameInput();
     var checkbox = getConfirmCheckbox();
     var continueButton = getContinueButton();
 
     buttons.forEach(function (button) {
-      if (!RANK_PURCHASES_ENABLED) {
-        button.disabled = true;
-        button.setAttribute("aria-disabled", "true");
-      }
-
-      button.addEventListener("click", handleBuyClick);
+      button.addEventListener("click", function (event) {
+        handleBuyClick(event);
+      });
     });
-
-    if (input) {
-      input.addEventListener("input", function () {
-        setStatus("");
-        if (checkbox) {
-          checkbox.checked = false;
-        }
-        validateUsernameInput();
-      });
-
-      input.addEventListener("keydown", function (event) {
-        if (event.key === "Enter" && continueButton && !continueButton.disabled) {
-          event.preventDefault();
-          handleConfirmClick();
-        }
-      });
-    }
 
     if (checkbox) {
       checkbox.addEventListener("change", updateConfirmState);
@@ -543,7 +523,7 @@
       }
     });
 
-    updateConfirmState();
+    refreshStoreAccess();
   }
 
   initializeCheckoutButtons();

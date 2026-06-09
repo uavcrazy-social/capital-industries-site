@@ -851,37 +851,6 @@ body.modal-open {
   margin-bottom: 24px;
 }
 
-.account-tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 22px;
-  padding: 6px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.035);
-}
-
-.account-tab {
-  min-height: 42px;
-  border: 1px solid transparent;
-  border-radius: 12px;
-  color: var(--muted);
-  background: transparent;
-  font: inherit;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.account-tab:hover,
-.account-tab:focus-visible,
-.account-tab.is-active {
-  border-color: rgba(255, 138, 24, 0.38);
-  color: var(--text);
-  background: rgba(255, 138, 24, 0.10);
-  outline: none;
-}
-
 .account-form {
   display: grid;
   gap: 12px;
@@ -898,6 +867,86 @@ body.modal-open {
   font-size: 1.2rem;
   letter-spacing: -0.02em;
 }
+
+.account-oauth-actions {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.oauth-button {
+  width: 100%;
+}
+
+.oauth-google {
+  background: linear-gradient(135deg, #ffffff, #f3f4f7);
+  color: #1f2430;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+.oauth-discord {
+  border: 1px solid rgba(88, 101, 242, 0.42);
+  color: #f5f6f8;
+  background: linear-gradient(135deg, rgba(88, 101, 242, 0.92), rgba(71, 82, 196, 0.92));
+}
+
+.store-auth-notice a {
+  color: var(--orange-bright);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.store-auth-notice a:hover,
+.store-auth-notice a:focus-visible {
+  text-decoration: underline;
+  outline: none;
+}
+
+.account-meta {
+  display: grid;
+  gap: 14px;
+  margin: 20px 0 24px;
+}
+
+.account-meta-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.account-meta-label {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.account-meta-value {
+  font-weight: 700;
+  text-align: right;
+}
+
+.account-status {
+  min-height: 1.4em;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.account-status.is-error { color: var(--danger); }
+.account-status.is-success { color: var(--success); }
+
+.username-lookup {
+  margin-top: 6px;
+  color: var(--muted-2);
+  font-size: 0.9rem;
+}
+
+.username-lookup.is-valid { color: var(--success); }
+.username-lookup.is-invalid { color: var(--danger); }
 
 @media (max-width: 920px) {
   .account-grid {

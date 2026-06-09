@@ -5,11 +5,11 @@ This site uses direct Headless Tebex checkout from `/store/`.
 ## Current frontend behavior
 
 - `Player` is display-only and is not connected to checkout.
-- `Member`, `Premium`, and `Elite` are active checkout buttons.
-- Before checkout opens, the buyer must enter a Minecraft Java username.
-- Mojang/Minecraft name lookup is temporarily disabled because browser-side lookup was failing.
-- The browser validates only the Java username format, then requires a manual confirmation checkbox.
-- Tebex checkout handles payment UI and payment email capture. The static site does not require its own email provider.
+- `Member`, `Premium`, and `Elite` are checkout buttons when `RANK_PURCHASES_ENABLED` is true.
+- Buyers must continue on `/account/` with Google or Discord.
+- Buyers must link a Minecraft username (Mojang lookup + confirmation) before checkout.
+- Checkout uses the linked username from Supabase `profiles`, not a free-text field.
+- Tebex checkout handles payment UI and payment processing.
 
 ## Public frontend values
 
@@ -25,13 +25,11 @@ var PACKAGE_IDS = {
 };
 ```
 
-Do not put a Tebex private key, webhook secret, admin API secret, SMTP password, or mail provider secret in this browser file.
+Do not put a Tebex private key, webhook secret, or admin API secret in this browser file.
 
 ## Account management
 
-The `/account/` page has been added, but password accounts require the included backend service under `server/`. Static hosting alone cannot safely create password accounts.
-
-See `ACCOUNT_BACKEND.md` for deployment and reset instructions.
+Public login is Google or Discord only. See `SUPABASE_SETUP.md` for provider configuration and the `profiles` table migration.
 
 ## Tebex package setup
 
@@ -46,4 +44,4 @@ See `ACCOUNT_BACKEND.md` for deployment and reset instructions.
 
 ## Rank delivery source of truth
 
-The website only collects the user-confirmed current Java username and opens checkout. LuckPerms/FTB/KubeJS server-side sync should remain the source of truth for permissions, limits, homes, claims, force-load caps, badges, demotions, and command access.
+The website collects the user-confirmed Java username and opens checkout. LuckPerms/FTB/KubeJS server-side sync should remain the source of truth for permissions, limits, homes, claims, force-load caps, badges, demotions, and command access.

@@ -152,8 +152,14 @@ Buy Elite
 </div>
 </article>
 </div>
+<div class="notice store-auth-notice" data-reveal="" hidden id="store-auth-notice">
+<strong>Account required.</strong>
+<a href="/account/?return=/store/">Continue with Google or Discord</a> and link your
+in-game username before buying a rank.
+</div>
 <div class="notice" data-reveal="">
 <strong>Note:</strong> Ranks are monthly support tiers. Tebex handles checkout and payment processing.
+Purchases require a signed-in account with a linked Minecraft username.
 </div>
 </section>
 </main>
@@ -177,16 +183,15 @@ Buy Elite
 <button aria-label="Close checkout dialog" class="store-modal-close" data-modal-dismiss="" type="button">×</button>
 <div class="store-modal-header">
 <p class="eyebrow">Checkout</p>
-<h2 class="store-modal-title" id="checkout-modal-title">Confirm your Minecraft username</h2>
+<h2 class="store-modal-title" id="checkout-modal-title">Confirm checkout</h2>
 <p class="store-modal-subtitle">
 You are buying <strong id="checkout-package-name">a rank</strong>
-<span id="checkout-package-price"></span>. Enter your current Minecraft Java name and confirm it before checkout.
+<span id="checkout-package-price"></span> for
+<strong id="checkout-linked-username">your player</strong>. Tebex will attach the rank to that in-game name.
 </p>
 </div>
-<label class="store-label" for="minecraft-username">Minecraft Java username</label>
-<input autocomplete="username" class="store-input store-modal-input" id="minecraft-username" maxlength="16" name="minecraft-username" placeholder="Example: Steve" type="text"/>
-<p class="username-help">Use your exact current Java username: 3-16 letters, numbers, or underscores.</p>
-<p class="username-lookup-result" id="username-lookup-result" aria-live="polite"></p>
+<p class="username-help">Username is linked to your account. Update it on the
+<a href="/account/">account page</a> if it changed.</p>
 <label class="confirm-check" for="username-confirmed">
 <input disabled id="username-confirmed" type="checkbox"/>
 <span>
@@ -205,6 +210,8 @@ Continue to secure checkout
 </div>
 </div>
 <tebex-checkout></tebex-checkout>
+<script src="/assets/supabase-config.js"></script>
+<script type="module" src="/assets/auth-client.js"></script>
 <script defer src="/assets/tebex-store.js"></script>
 <script defer="" src="/assets/site.js"></script>
 </body>
