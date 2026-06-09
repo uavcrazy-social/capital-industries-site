@@ -7,7 +7,8 @@ This site uses direct Headless Tebex checkout from `/store/`.
 - `Player` is display-only and is not connected to checkout.
 - `Member`, `Premium`, and `Elite` are active checkout buttons.
 - Before checkout opens, the buyer must enter a Minecraft Java username.
-- The browser validates the name format, checks current profile existence with Minecraft/Mojang profile lookup APIs, then requires a manual confirmation checkbox.
+- Mojang/Minecraft name lookup is temporarily disabled because browser-side lookup was failing.
+- The browser validates only the Java username format, then requires a manual confirmation checkbox.
 - Tebex checkout handles payment UI and payment email capture. The static site does not require its own email provider.
 
 ## Public frontend values
@@ -26,6 +27,12 @@ var PACKAGE_IDS = {
 
 Do not put a Tebex private key, webhook secret, admin API secret, SMTP password, or mail provider secret in this browser file.
 
+## Account management
+
+The `/account/` page has been added, but password accounts require the included backend service under `server/`. Static hosting alone cannot safely create password accounts.
+
+See `ACCOUNT_BACKEND.md` for deployment and reset instructions.
+
 ## Tebex package setup
 
 1. Make sure the store/game type is Minecraft Java-compatible.
@@ -39,4 +46,4 @@ Do not put a Tebex private key, webhook secret, admin API secret, SMTP password,
 
 ## Rank delivery source of truth
 
-The website only collects the current Java username and opens checkout. LuckPerms/FTB/KubeJS server-side sync should remain the source of truth for permissions, limits, homes, claims, force-load caps, badges, demotions, and command access.
+The website only collects the user-confirmed current Java username and opens checkout. LuckPerms/FTB/KubeJS server-side sync should remain the source of truth for permissions, limits, homes, claims, force-load caps, badges, demotions, and command access.

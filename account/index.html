@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Account | Capital Industries</title>
+<meta content="Create or manage a Capital Industries website account with a Minecraft username and password." name="description"/>
+<link href="/favicon.ico" rel="icon" sizes="any"/>
+<link href="/assets/icons/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/assets/icons/apple-touch-icon.png" rel="apple-touch-icon"/>
+<link href="/site.webmanifest" rel="manifest"/>
+<link href="/download/" rel="prefetch"/>
+<link href="/store/" rel="prefetch"/>
+<link href="/account/" rel="prefetch"/>
+<meta content="#ff8a18" name="theme-color"/>
+<link href="/assets/site.css" rel="stylesheet"/>
+</head>
+<body>
+<header class="site-header">
+<div class="site-shell navbar">
+<a aria-label="Capital Industries home" class="brand" href="/">
+<img alt="" class="brand-icon" height="40" src="/assets/brand/server-icon.png" width="40"/>
+<span class="brand-text">
+<span class="brand-title">Capital Industries</span>
+<span class="brand-subtitle">Season 3</span>
+</span>
+</a>
+<nav aria-label="Primary navigation" class="nav-links">
+<a class="nav-link" href="/download"><img alt="" class="nav-icon" src="/assets/icons/download.svg"/> Download</a>
+<a class="nav-link" href="/store"><img alt="" class="nav-icon" src="/assets/icons/store.svg"/> Store</a>
+<a class="nav-link nav-link-active" href="/account"><img alt="" class="nav-icon" src="/assets/icons/community.svg"/> Account</a>
+<a class="nav-link" href="https://map.capitalindustries.net/" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/bluemap-logo.png"/> Map</a>
+<a class="nav-link" href="https://discord.gg/jj7fFEYYfk" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/discord-logo.png"/> Discord</a>
+<a class="nav-link" href="https://ko-fi.com/dtmpro621" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/icons/kofi.svg"/> Donate</a>
+<a class="nav-link nav-link-cta" href="/download"><img alt="" class="nav-icon nav-icon-play" src="/assets/icons/play.svg"/> Play</a>
+</nav>
+</div>
+</header>
+<main>
+<section class="site-shell hero hero-compact">
+<div data-reveal="">
+<p class="eyebrow">Capital Industries Account</p>
+<h1 class="page-title">Manage <span class="accent">access</span></h1>
+<p class="tagline">
+Create a simple website account using your current Minecraft Java username and a password. No email provider, email verification, or 2FA flow is required for this first pass.
+</p>
+</div>
+</section>
+<section class="site-shell section">
+<div class="notice" data-reveal="">
+<strong>Current account model:</strong> this page requires the included backend service. Without that server process, the forms will display an API unavailable message. Password recovery is manual because no email provider is configured.
+</div>
+<div class="account-grid" data-reveal="">
+<article class="panel account-panel" id="account-session-panel" hidden>
+<div class="account-panel-header">
+<div>
+<p class="eyebrow">Signed in</p>
+<h2 class="link-title" id="account-display-name">Account</h2>
+<p class="link-text" id="account-summary">Session loaded.</p>
+</div>
+<button class="button button-ghost" id="logout-button" type="button">Sign out</button>
+</div>
+<form class="account-form" id="profile-form" novalidate>
+<h3 class="account-subtitle">Minecraft username</h3>
+<label class="store-label" for="profile-minecraft-username">Current Java username</label>
+<input autocomplete="username" class="store-input" id="profile-minecraft-username" maxlength="16" name="minecraftUsername" pattern="[A-Za-z0-9_]{3,16}" required type="text"/>
+<label class="confirm-check" for="profile-username-confirmed">
+<input id="profile-username-confirmed" required type="checkbox"/>
+<span>I confirm this is my exact current in-game name. If it is wrong, rank delivery may require manual support.</span>
+</label>
+<button class="button button-primary" type="submit">Save username</button>
+<p aria-live="polite" class="checkout-status" id="profile-status"></p>
+</form>
+<form class="account-form" id="password-form" novalidate>
+<h3 class="account-subtitle">Password</h3>
+<label class="store-label" for="current-password">Current password</label>
+<input autocomplete="current-password" class="store-input" id="current-password" maxlength="128" name="currentPassword" required type="password"/>
+<label class="store-label" for="new-password">New password</label>
+<input autocomplete="new-password" class="store-input" id="new-password" maxlength="128" minlength="12" name="newPassword" required type="password"/>
+<p class="username-help">Use at least 12 characters. Password reset is manual without email.</p>
+<button class="button button-primary" type="submit">Change password</button>
+<p aria-live="polite" class="checkout-status" id="password-status"></p>
+</form>
+</article>
+<article class="panel account-panel" id="auth-panel">
+<div class="account-tabs" role="tablist" aria-label="Account access mode">
+<button aria-controls="register-panel" aria-selected="true" class="account-tab is-active" data-account-tab="register" id="register-tab" role="tab" type="button">Create account</button>
+<button aria-controls="login-panel" aria-selected="false" class="account-tab" data-account-tab="login" id="login-tab" role="tab" type="button">Sign in</button>
+</div>
+<form aria-labelledby="register-tab" class="account-form" id="register-form" role="tabpanel" novalidate>
+<h2 class="link-title">Create account</h2>
+<p class="link-text">Use your current Minecraft Java username. Name lookup is not used in this temporary flow.</p>
+<label class="store-label" for="register-minecraft-username">Minecraft Java username</label>
+<input autocomplete="username" class="store-input" id="register-minecraft-username" maxlength="16" name="minecraftUsername" pattern="[A-Za-z0-9_]{3,16}" placeholder="Example: Steve" required type="text"/>
+<label class="store-label" for="register-password">Password</label>
+<input autocomplete="new-password" class="store-input" id="register-password" maxlength="128" minlength="12" name="password" required type="password"/>
+<label class="store-label" for="register-password-confirm">Confirm password</label>
+<input autocomplete="new-password" class="store-input" id="register-password-confirm" maxlength="128" minlength="12" name="passwordConfirm" required type="password"/>
+<label class="confirm-check" for="register-username-confirmed">
+<input id="register-username-confirmed" required type="checkbox"/>
+<span>I confirm this is my exact current in-game name.</span>
+</label>
+<button class="button button-primary" type="submit">Create account</button>
+<p aria-live="polite" class="checkout-status" id="register-status"></p>
+</form>
+<form aria-labelledby="login-tab" class="account-form" hidden id="login-form" role="tabpanel" novalidate>
+<h2 class="link-title">Sign in</h2>
+<p class="link-text">Use the Minecraft username and password created here.</p>
+<label class="store-label" for="login-minecraft-username">Minecraft Java username</label>
+<input autocomplete="username" class="store-input" id="login-minecraft-username" maxlength="16" name="minecraftUsername" required type="text"/>
+<label class="store-label" for="login-password">Password</label>
+<input autocomplete="current-password" class="store-input" id="login-password" maxlength="128" name="password" required type="password"/>
+<button class="button button-primary" type="submit">Sign in</button>
+<p aria-live="polite" class="checkout-status" id="login-status"></p>
+</form>
+</article>
+<aside class="panel account-panel account-secondary">
+<p class="eyebrow">No email mode</p>
+<h2 class="link-title">Limits of this first pass</h2>
+<ul class="perk-list">
+<li>No automatic password reset email.</li>
+<li>No 2FA challenge or recovery code flow.</li>
+<li>Manual admin reset is required if someone forgets a password.</li>
+<li>Tebex remains the payment processor for paid ranks.</li>
+</ul>
+<a class="button button-ghost" href="/store">Go to ranks</a>
+</aside>
+</div>
+</section>
+</main>
+<footer class="footer">
+<div class="site-shell footer-inner">
+<span>Capital Industries · Season 3 Modded Minecraft</span>
+<nav aria-label="Footer links" class="footer-links">
+<a href="/download">Download</a>
+<a href="/store">Ranks</a>
+<a href="/account">Account</a>
+<a href="https://map.capitalindustries.net/" rel="noopener noreferrer" target="_blank">Live Map</a>
+<a href="https://discord.gg/jj7fFEYYfk" rel="noopener noreferrer" target="_blank">Discord</a>
+<a href="https://www.curseforge.com/minecraft/modpacks/capital-industries-server" rel="noopener noreferrer" target="_blank">CurseForge</a>
+<a href="https://www.modpackindex.com/modpack/117341/capital-industries-server" rel="noopener noreferrer" target="_blank">Modpack Index</a>
+</nav>
+</div>
+</footer>
+<script defer src="/assets/account.js"></script>
+<script defer src="/assets/site.js"></script>
+</body>
+</html>

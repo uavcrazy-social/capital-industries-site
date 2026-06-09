@@ -16,8 +16,6 @@
 
   var USERNAME_PATTERN = /^[A-Za-z0-9_]{3,16}$/;
   var HEADLESS_API_BASE = "https://headless.tebex.io/api";
-  var MINECRAFT_SERVICES_PROFILE_URL = "https://api.minecraftservices.com/minecraft/profile/lookup/name/";
-  var MOJANG_PROFILE_URL = "https://api.mojang.com/users/profiles/minecraft/";
   var PACKAGE_DISPLAY = {
     member: {
       name: "Member",
@@ -33,19 +31,10 @@
     }
   };
   var MODAL_CLOSE_DELAY_MS = 190;
-  var USERNAME_LOOKUP_DEBOUNCE_MS = 450;
   var pendingPackageKey = "";
   var pendingTrigger = null;
   var checkoutBusy = false;
   var closeTimer = 0;
-  var lookupTimer = 0;
-  var lookupSequence = 0;
-  var lookupState = {
-    input: "",
-    status: "idle",
-    profile: null,
-    error: ""
-  };
 
   function getStatusElement() {
     return document.getElementById("checkout-status");
@@ -98,18 +87,6 @@
     }
 
     return input.value.trim();
-  }
-
-  function normalizeUsername(username) {
-    return String(username || "").trim().toLowerCase();
-  }
-
-  function getVerifiedUsername() {
-    if (lookupState.profile && lookupState.profile.name) {
-      return lookupState.profile.name;
-    }
-
-    return getUsername();
   }
 
   function getStoredUsername() {
@@ -171,18 +148,6 @@
     });
   }
 
-  function resetLookupState() {
-    lookupSequence += 1;
-    lookupState = {
-      input: "",
-      status: "idle",
-      profile: null,
-      error: ""
-    };
-    window.clearTimeout(lookupTimer);
-    setLookupMessage("", "idle");
-  }
-
   function setModalBusy(disabled) {
     var modal = getModal();
     var dismissers = modal ? modal.querySelectorAll("[data-modal-dismiss]") : [];
@@ -207,224 +172,52 @@
     updateConfirmState();
   }
 
-  function isLookupConfirmedFor(username) {
-    var profile = lookupState.profile;
-
-    if (!profile || lookupState.status !== "found") {
-      return false;
-    }
-
-    return normalizeUsername(profile.name) === normalizeUsername(username) &&
-      normalizeUsername(lookupState.input) === normalizeUsername(username);
-  }
-
   function updateConfirmState() {
     var username = getUsername();
     var checkbox = getConfirmCheckbox();
     var continueButton = getContinueButton();
     var preview = document.getElementById("username-preview");
     var validUsername = USERNAME_PATTERN.test(username);
-    var verified = validUsername && isLookupConfirmedFor(username);
     var confirmed = Boolean(checkbox && checkbox.checked);
 
     if (preview) {
-      preview.textContent = verified ? getVerifiedUsername() : username || "this username";
+      preview.textContent = username || "this username";
     }
 
     if (checkbox) {
-      checkbox.disabled = checkoutBusy || !verified;
+      checkbox.disabled = checkoutBusy || !validUsername;
+
+      if (!validUsername) {
+        checkbox.checked = false;
+      }
     }
 
     if (continueButton) {
-      continueButton.disabled = checkoutBusy || !validUsername || !verified || !confirmed;
+      continueButton.disabled = checkoutBusy || !validUsername || !confirmed;
     }
   }
 
-  function applyProfileResult(username, profile) {
-    var canonicalName = profile && profile.name ? profile.name : username;
-
-    lookupState = {
-      input: username,
-      status: "found",
-      profile: {
-        id: String(profile && profile.id ? profile.id : ""),
-        name: canonicalName
-      },
-      error: ""
-    };
-
-    setLookupMessage("Found current Java username: " + canonicalName + ".", "success");
-    updateConfirmState();
-  }
-
-  function applyProfileMissing(username) {
-    lookupState = {
-      input: username,
-      status: "missing",
-      profile: null,
-      error: "not-found"
-    };
-
-    setLookupMessage("No current Minecraft Java profile was found for " + username + ".", "error");
-    updateConfirmState();
-  }
-
-  function applyProfileError(username, message) {
-    lookupState = {
-      input: username,
-      status: "error",
-      profile: null,
-      error: message || "lookup-failed"
-    };
-
-    setLookupMessage(
-      "Username lookup failed. Check the name or try again before checkout.",
-      "error"
-    );
-    updateConfirmState();
-  }
-
-  async function fetchProfile(url) {
-    var response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Accept": "application/json"
-      }
-    });
-
-    if (response.status === 204 || response.status === 404) {
-      return null;
-    }
-
-    if (!response.ok) {
-      throw new Error("Profile lookup failed with HTTP " + response.status + ".");
-    }
-
-    return response.json();
-  }
-
-  async function lookupMinecraftProfile(username) {
-    var encodedUsername = encodeURIComponent(username);
-    var lastError = null;
-    var profile = null;
-
-    try {
-      profile = await fetchProfile(MINECRAFT_SERVICES_PROFILE_URL + encodedUsername);
-    } catch (error) {
-      lastError = error;
-    }
-
-    if (profile && normalizeUsername(profile.name) === normalizeUsername(username)) {
-      return profile;
-    }
-
-    try {
-      profile = await fetchProfile(MOJANG_PROFILE_URL + encodedUsername);
-    } catch (error) {
-      lastError = error;
-    }
-
-    if (profile && normalizeUsername(profile.name) === normalizeUsername(username)) {
-      return profile;
-    }
-
-    if (lastError && !profile) {
-      throw lastError;
-    }
-
-    return null;
-  }
-
-  async function verifyUsernameNow(username) {
-    var sequence = ++lookupSequence;
-
-    window.clearTimeout(lookupTimer);
-
-    if (!USERNAME_PATTERN.test(username)) {
-      resetLookupState();
-      setLookupMessage(
-        username ? "Use 3-16 letters, numbers, or underscores." : "",
-        username ? "error" : "idle"
-      );
-      updateConfirmState();
-      return false;
-    }
-
-    lookupState = {
-      input: username,
-      status: "checking",
-      profile: null,
-      error: ""
-    };
-    setLookupMessage("Checking Mojang profile lookup...", "checking");
-    updateConfirmState();
-
-    try {
-      var profile = await lookupMinecraftProfile(username);
-
-      if (sequence !== lookupSequence) {
-        return false;
-      }
-
-      if (!profile) {
-        applyProfileMissing(username);
-        return false;
-      }
-
-      applyProfileResult(username, profile);
-      return true;
-    } catch (error) {
-      if (sequence !== lookupSequence) {
-        return false;
-      }
-
-      console.error(error);
-      applyProfileError(username, error.message);
-      return false;
-    }
-  }
-
-  function scheduleUsernameLookup() {
-    lookupSequence += 1;
+  function validateUsernameInput() {
     var username = getUsername();
-    var checkbox = getConfirmCheckbox();
-
-    if (checkbox) {
-      checkbox.checked = false;
-    }
-
-    window.clearTimeout(lookupTimer);
 
     if (!username) {
-      resetLookupState();
+      setLookupMessage("", "idle");
       updateConfirmState();
-      return;
+      return false;
     }
 
     if (!USERNAME_PATTERN.test(username)) {
-      lookupState = {
-        input: username,
-        status: "invalid",
-        profile: null,
-        error: "invalid-format"
-      };
       setLookupMessage("Use 3-16 letters, numbers, or underscores.", "error");
       updateConfirmState();
-      return;
+      return false;
     }
 
-    lookupState = {
-      input: username,
-      status: "queued",
-      profile: null,
-      error: ""
-    };
-    setLookupMessage("Ready to check username...", "checking");
+    setLookupMessage(
+      "Username lookup is temporarily disabled. Confirm this is your exact current Java name before checkout.",
+      "success"
+    );
     updateConfirmState();
-
-    lookupTimer = window.setTimeout(function () {
-      verifyUsernameNow(username);
-    }, USERNAME_LOOKUP_DEBOUNCE_MS);
+    return true;
   }
 
   function openUsernameModal(packageKey, trigger) {
@@ -455,7 +248,7 @@
     input.value = getStoredUsername();
     checkbox.checked = false;
     setStatus("");
-    resetLookupState();
+    setLookupMessage("", "idle");
     setModalBusy(false);
 
     modal.hidden = false;
@@ -469,7 +262,7 @@
     window.setTimeout(function () {
       input.focus();
       input.select();
-      scheduleUsernameLookup();
+      validateUsernameInput();
     }, 90);
   }
 
@@ -483,12 +276,11 @@
     modal.classList.remove("is-open");
     modal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("modal-open");
-    window.clearTimeout(lookupTimer);
 
     closeTimer = window.setTimeout(function () {
       modal.hidden = true;
       setStatus("");
-      resetLookupState();
+      setLookupMessage("", "idle");
 
       if (pendingTrigger && typeof pendingTrigger.focus === "function") {
         pendingTrigger.focus();
@@ -529,8 +321,9 @@
           complete_auto_redirect: true,
           custom: {
             source: "capital-industries-store",
-            minecraft_uuid: lookupState.profile && lookupState.profile.id ? lookupState.profile.id : "",
-            minecraft_username: username
+            minecraft_username: username,
+            username_confirmed_by_buyer: true,
+            minecraft_uuid: ""
           }
         })
       }
@@ -675,7 +468,7 @@
     }
   }
 
-  async function handleConfirmClick() {
+  function handleConfirmClick() {
     var username = getUsername();
 
     if (!USERNAME_PATTERN.test(username)) {
@@ -684,13 +477,10 @@
       return;
     }
 
-    if (!isLookupConfirmedFor(username)) {
-      setStatus("Verifying Minecraft username before checkout...");
-
-      if (!await verifyUsernameNow(username)) {
-        setStatus("Username must be verified before checkout.");
-        return;
-      }
+    if (!getConfirmCheckbox() || !getConfirmCheckbox().checked) {
+      setStatus("Confirm the username is your current in-game name before checkout.");
+      updateConfirmState();
+      return;
     }
 
     if (!pendingPackageKey) {
@@ -698,7 +488,7 @@
       return;
     }
 
-    beginCheckout(pendingPackageKey, getVerifiedUsername());
+    beginCheckout(pendingPackageKey, username);
   }
 
   function initializeCheckoutButtons() {
@@ -720,7 +510,10 @@
     if (input) {
       input.addEventListener("input", function () {
         setStatus("");
-        scheduleUsernameLookup();
+        if (checkbox) {
+          checkbox.checked = false;
+        }
+        validateUsernameInput();
       });
 
       input.addEventListener("keydown", function (event) {

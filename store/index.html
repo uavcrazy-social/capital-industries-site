@@ -11,6 +11,7 @@
 <link href="/site.webmanifest" rel="manifest"/>
 <link href="/download/" rel="prefetch"/>
 <link href="/store/" rel="prefetch"/>
+<link href="/account/" rel="prefetch"/>
 <meta content="#ff8a18" name="theme-color"/>
 <link href="/assets/site.css" rel="stylesheet"/>
 <script defer src="https://js.tebex.io/v/1.js"></script>
@@ -28,6 +29,7 @@
 <nav aria-label="Primary navigation" class="nav-links">
 <a class="nav-link" href="/download"><img alt="" class="nav-icon" src="/assets/icons/download.svg"/> Download</a>
 <a class="nav-link nav-link-active" href="/store"><img alt="" class="nav-icon" src="/assets/icons/store.svg"/> Store</a>
+<a class="nav-link" href="/account"><img alt="" class="nav-icon" src="/assets/icons/community.svg"/> Account</a>
 <a class="nav-link" href="https://map.capitalindustries.net/" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/bluemap-logo.png"/> Map</a>
 <a class="nav-link" href="https://discord.gg/jj7fFEYYfk" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/discord-logo.png"/> Discord</a>
 <a class="nav-link" href="https://ko-fi.com/dtmpro621" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/icons/kofi.svg"/> Donate</a>
@@ -64,7 +66,7 @@ without requiring a monthly rank.
 </section>
 <section class="site-shell section">
 <div class="notice" data-reveal="">
-<strong>Username verification required:</strong> paid ranks validate your current Minecraft Java username before secure Tebex checkout opens.
+<strong>Username confirmation required:</strong> paid ranks require the buyer to enter and confirm their current Minecraft Java username before secure Tebex checkout opens.
 </div>
 <div aria-label="Monthly server ranks" class="rank-grid rank-grid-four">
 <article class="rank-card rank-player" data-reveal="">
@@ -151,7 +153,7 @@ Buy Elite
 </article>
 </div>
 <div class="notice" data-reveal="">
-<strong>Note:</strong> Ranks are monthly support tiers. Tebex handles checkout and payment processing. Use Discord for purchase support.
+<strong>Note:</strong> Ranks are monthly support tiers. Tebex handles checkout and payment processing; the site does not need its own email provider for purchase flow.
 </div>
 </section>
 </main>
@@ -161,6 +163,7 @@ Buy Elite
 <nav aria-label="Footer links" class="footer-links">
 <a href="/download">Download</a>
 <a href="/store">Ranks</a>
+<a href="/account">Account</a>
 <a href="https://map.capitalindustries.net/" rel="noopener noreferrer" target="_blank">Live Map</a>
 <a href="https://discord.gg/jj7fFEYYfk" rel="noopener noreferrer" target="_blank">Discord</a>
 <a href="https://www.curseforge.com/minecraft/modpacks/capital-industries-server" rel="noopener noreferrer" target="_blank">CurseForge</a>
@@ -177,12 +180,12 @@ Buy Elite
 <h2 class="store-modal-title" id="checkout-modal-title">Confirm your Minecraft username</h2>
 <p class="store-modal-subtitle">
 You are buying <strong id="checkout-package-name">a rank</strong>
-<span id="checkout-package-price"></span>. Enter your current Minecraft Java name; checkout stays locked until the name exists.
+<span id="checkout-package-price"></span>. Enter your current Minecraft Java name. Mojang lookup is temporarily disabled, so checkout relies on your explicit confirmation.
 </p>
 </div>
 <label class="store-label" for="minecraft-username">Minecraft Java username</label>
 <input autocomplete="username" class="store-input store-modal-input" id="minecraft-username" maxlength="16" name="minecraft-username" placeholder="Example: Steve" type="text"/>
-<p class="username-help">Use your current Java username: 3-16 letters, numbers, or underscores.</p>
+<p class="username-help">Use your exact current Java username: 3-16 letters, numbers, or underscores. Name lookup is temporarily disabled.</p>
 <p class="username-lookup-result" id="username-lookup-result" aria-live="polite"></p>
 <label class="confirm-check" for="username-confirmed">
 <input disabled id="username-confirmed" type="checkbox"/>
