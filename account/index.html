@@ -42,13 +42,13 @@
 <p class="eyebrow">Capital Industries Account</p>
 <h1 class="page-title">Manage <span class="accent">access</span></h1>
 <p class="tagline">
-Create a simple website account using your current Minecraft Java username and a password. No email provider, email verification, or 2FA flow is required for this first pass.
+Create or sign in using your current Minecraft Java username and password.
 </p>
 </div>
 </section>
 <section class="site-shell section">
-<div class="notice" data-reveal="">
-<strong>Current account model:</strong> this page requires the included backend service. Without that server process, the forms will display an API unavailable message. Password recovery is manual because no email provider is configured.
+<div class="notice account-service-warning" hidden id="account-service-warning" data-reveal="">
+Account access is temporarily unavailable. Try again later or contact Discord support.
 </div>
 <div class="account-grid" data-reveal="">
 <article class="panel account-panel" id="account-session-panel" hidden>
@@ -66,7 +66,7 @@ Create a simple website account using your current Minecraft Java username and a
 <input autocomplete="username" class="store-input" id="profile-minecraft-username" maxlength="16" name="minecraftUsername" pattern="[A-Za-z0-9_]{3,16}" required type="text"/>
 <label class="confirm-check" for="profile-username-confirmed">
 <input id="profile-username-confirmed" required type="checkbox"/>
-<span>I confirm this is my exact current in-game name. If it is wrong, rank delivery may require manual support.</span>
+<span>I confirm this is my exact current in-game name. If it is wrong, rank delivery may not apply correctly.</span>
 </label>
 <button class="button button-primary" type="submit">Save username</button>
 <p aria-live="polite" class="checkout-status" id="profile-status"></p>
@@ -77,7 +77,7 @@ Create a simple website account using your current Minecraft Java username and a
 <input autocomplete="current-password" class="store-input" id="current-password" maxlength="128" name="currentPassword" required type="password"/>
 <label class="store-label" for="new-password">New password</label>
 <input autocomplete="new-password" class="store-input" id="new-password" maxlength="128" minlength="12" name="newPassword" required type="password"/>
-<p class="username-help">Use at least 12 characters. Password reset is manual without email.</p>
+<p class="username-help">Use at least 12 characters.</p>
 <button class="button button-primary" type="submit">Change password</button>
 <p aria-live="polite" class="checkout-status" id="password-status"></p>
 </form>
@@ -89,7 +89,7 @@ Create a simple website account using your current Minecraft Java username and a
 </div>
 <form aria-labelledby="register-tab" class="account-form" id="register-form" role="tabpanel" novalidate>
 <h2 class="link-title">Create account</h2>
-<p class="link-text">Use your current Minecraft Java username. Name lookup is not used in this temporary flow.</p>
+<p class="link-text">Use your current Minecraft Java username.</p>
 <label class="store-label" for="register-minecraft-username">Minecraft Java username</label>
 <input autocomplete="username" class="store-input" id="register-minecraft-username" maxlength="16" name="minecraftUsername" pattern="[A-Za-z0-9_]{3,16}" placeholder="Example: Steve" required type="text"/>
 <label class="store-label" for="register-password">Password</label>
@@ -115,13 +115,12 @@ Create a simple website account using your current Minecraft Java username and a
 </form>
 </article>
 <aside class="panel account-panel account-secondary">
-<p class="eyebrow">No email mode</p>
-<h2 class="link-title">Limits of this first pass</h2>
+<p class="eyebrow">Account help</p>
+<h2 class="link-title">Use one exact Java name</h2>
 <ul class="perk-list">
-<li>No automatic password reset email.</li>
-<li>No 2FA challenge or recovery code flow.</li>
-<li>Manual admin reset is required if someone forgets a password.</li>
-<li>Tebex remains the payment processor for paid ranks.</li>
+<li>Your account name should match your current in-game name.</li>
+<li>Ranks are still purchased through the store.</li>
+<li>For account help, contact support in Discord.</li>
 </ul>
 <a class="button button-ghost" href="/store">Go to ranks</a>
 </aside>

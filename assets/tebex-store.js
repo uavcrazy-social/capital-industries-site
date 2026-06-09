@@ -1,10 +1,6 @@
 (function () {
   "use strict";
 
-  /**
-   * Public Tebex identifiers only. Do not put a private key, secret key,
-   * webhook secret, or admin API secret in this browser file.
-   */
   var RANK_PURCHASES_ENABLED = true;
 
   var TEBEX_PUBLIC_TOKEN = "13bmd-225b100e916451ed82c9e96183f8929d044f437c";
@@ -101,7 +97,6 @@
     try {
       window.localStorage.setItem("capital-industries-minecraft-username", username);
     } catch (error) {
-      // Storage can fail in private browsing. Checkout should still proceed.
     }
   }
 
@@ -213,7 +208,7 @@
     }
 
     setLookupMessage(
-      "Username lookup is temporarily disabled. Confirm this is your exact current Java name before checkout.",
+      "Confirm this is your exact current Java username before checkout.",
       "success"
     );
     updateConfirmState();

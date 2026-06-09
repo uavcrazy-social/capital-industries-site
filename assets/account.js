@@ -4,6 +4,7 @@
   var USERNAME_PATTERN = /^[A-Za-z0-9_]{3,16}$/;
   var MIN_PASSWORD_LENGTH = 12;
   var MAX_PASSWORD_LENGTH = 128;
+  var API_UNAVAILABLE_MESSAGE = "Account access is temporarily unavailable. Try again later or contact Discord support.";
 
   function byId(id) {
     return document.getElementById(id);
@@ -41,19 +42,48 @@
     return password.length >= MIN_PASSWORD_LENGTH && password.length <= MAX_PASSWORD_LENGTH;
   }
 
+  function setApiWarning(visible) {
+    var warning = byId("account-service-warning");
+
+    if (warning) {
+      warning.hidden = !visible;
+    }
+  }
+
+  function isJsonResponse(response) {
+    var contentType = response.headers.get("content-type") || "";
+    return contentType.toLowerCase().indexOf("application/json") !== -1;
+  }
+
   async function requestJson(path, options) {
-    var response = await fetch(path, Object.assign({
-      credentials: "same-origin",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }, options || {}));
-    var payload = await response.json().catch(function () {
+    var response;
+    var payload;
+
+    try {
+      response = await fetch(path, Object.assign({
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }, options || {}));
+    } catch (error) {
+      throw new Error(API_UNAVAILABLE_MESSAGE);
+    }
+
+    if (!isJsonResponse(response)) {
+      throw new Error(API_UNAVAILABLE_MESSAGE);
+    }
+
+    payload = await response.json().catch(function () {
       return {};
     });
 
     if (!response.ok) {
-      throw new Error(payload.error || payload.message || "Request failed.");
+      if (response.status === 404 || response.status === 405) {
+        throw new Error(API_UNAVAILABLE_MESSAGE);
+      }
+
+      throw new Error(payload.error || payload.message || "Unable to complete request.");
     }
 
     return payload;
@@ -115,7 +145,7 @@
     setText("account-display-name", account.minecraftUsername || "Account");
     setText(
       "account-summary",
-      "Created " + new Date(account.createdAt).toLocaleDateString() + ". Email is not attached to this account."
+      "Created " + new Date(account.createdAt).toLocaleDateString() + "."
     );
 
     if (usernameInput) {
@@ -131,6 +161,8 @@
     try {
       var payload = await requestJson("/api/auth/me", { method: "GET", headers: {} });
 
+      setApiWarning(false);
+
       if (payload.account) {
         renderSignedIn(payload.account);
         return;
@@ -138,6 +170,7 @@
 
       renderSignedOut();
     } catch (error) {
+      setApiWarning(error.message === API_UNAVAILABLE_MESSAGE);
       renderSignedOut();
     }
   }
@@ -185,6 +218,7 @@
       form.reset();
       await refreshSession();
     } catch (error) {
+      setApiWarning(error.message === API_UNAVAILABLE_MESSAGE);
       setText("register-status", error.message);
     } finally {
       setBusy(form, false);
@@ -216,6 +250,7 @@
       form.reset();
       await refreshSession();
     } catch (error) {
+      setApiWarning(error.message === API_UNAVAILABLE_MESSAGE);
       setText("login-status", error.message);
     } finally {
       setBusy(form, false);
@@ -252,6 +287,7 @@
       setText("profile-status", "Username saved.");
       await refreshSession();
     } catch (error) {
+      setApiWarning(error.message === API_UNAVAILABLE_MESSAGE);
       setText("profile-status", error.message);
     } finally {
       setBusy(form, false);
@@ -283,6 +319,7 @@
       form.reset();
       setText("password-status", "Password changed.");
     } catch (error) {
+      setApiWarning(error.message === API_UNAVAILABLE_MESSAGE);
       setText("password-status", error.message);
     } finally {
       setBusy(form, false);
@@ -293,7 +330,6 @@
     try {
       await requestJson("/api/auth/logout", { method: "POST", body: "{}" });
     } catch (error) {
-      // Treat logout as complete even if the server already expired the session.
     }
 
     renderSignedOut();
