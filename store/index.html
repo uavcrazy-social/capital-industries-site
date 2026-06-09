@@ -64,20 +64,6 @@
 </div>
 </section>
 <section class="site-shell section">
-<div class="panel checkout-panel" data-reveal="">
-<div>
-<p class="eyebrow">Checkout</p>
-<h2 class="link-title">Enter your Minecraft username before buying.</h2>
-<p class="link-text">
-            Tebex uses this username to attach the rank to the correct player.
-          </p>
-</div>
-<div class="checkout-controls">
-<label class="store-label" for="minecraft-username">Minecraft Java username</label>
-<input autocomplete="username" class="store-input" id="minecraft-username" maxlength="16" name="minecraft-username" placeholder="Example: Steve" type="text"/>
-<p class="checkout-status" id="checkout-status" aria-live="polite"></p>
-</div>
-</div>
 <div aria-label="Monthly server ranks" class="rank-grid">
 <article class="rank-card rank-member" data-reveal="">
 <h2 class="rank-name">Member</h2>
@@ -167,6 +153,40 @@
 </nav>
 </div>
 </footer>
+<div aria-hidden="true" aria-labelledby="checkout-modal-title" aria-modal="true" class="store-modal" hidden id="checkout-identity-modal" role="dialog">
+<div class="store-modal-backdrop" data-modal-dismiss=""></div>
+<div class="store-modal-card" role="document">
+<button aria-label="Close checkout dialog" class="store-modal-close" data-modal-dismiss="" type="button">×</button>
+<div class="store-modal-header">
+<p class="eyebrow">Checkout</p>
+<h2 class="store-modal-title" id="checkout-modal-title">Confirm your Minecraft username</h2>
+<p class="store-modal-subtitle">
+          You are buying <strong id="checkout-package-name">a rank</strong>
+          <span id="checkout-package-price"></span>. Tebex will attach the rank
+          to the exact username entered here.
+        </p>
+</div>
+<label class="store-label" for="minecraft-username">Minecraft Java username</label>
+<input autocomplete="username" class="store-input store-modal-input" id="minecraft-username" maxlength="16" name="minecraft-username" placeholder="Example: Steve" type="text"/>
+<p class="username-help">Use your exact Java username: 3-16 letters, numbers, or underscores.</p>
+<label class="confirm-check" for="username-confirmed">
+<input id="username-confirmed" type="checkbox"/>
+<span>
+          I confirm <strong id="username-preview">this username</strong> is my exact in-game name.
+          If it is wrong, the rank may not apply and manual support may be required.
+        </span>
+</label>
+<p class="checkout-status" id="checkout-status" aria-live="polite"></p>
+<div class="store-modal-actions">
+<button class="button button-ghost" data-modal-dismiss="" type="button">Cancel</button>
+<button class="button button-primary" disabled id="checkout-continue" type="button">
+<img alt="" class="button-icon" src="/assets/icons/store.svg"/>
+          Continue to secure checkout
+        </button>
+</div>
+</div>
+</div>
+
 <tebex-checkout></tebex-checkout>
 <script defer src="/assets/tebex-store.js"></script>
 <script defer="" src="/assets/site.js"></script>
