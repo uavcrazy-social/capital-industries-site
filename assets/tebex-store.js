@@ -6,6 +6,9 @@
    * Public token and package IDs are public identifiers. Do not put a private
    * key, secret key, webhook secret, or API secret in this browser file.
    */
+  // Set to true to re-enable Member, Premium, and Elite checkout buttons.
+  var RANK_PURCHASES_ENABLED = false;
+
   var TEBEX_PUBLIC_TOKEN = "13bmd-225b100e916451ed82c9e96183f8929d044f437c";
   var PACKAGE_IDS = {
     member: "7490093",
@@ -404,6 +407,10 @@
   }
 
   function handleBuyClick(event) {
+    if (!RANK_PURCHASES_ENABLED) {
+      return;
+    }
+
     var packageKey = event.currentTarget.getAttribute("data-tebex-package");
 
     try {
@@ -441,6 +448,11 @@
     var continueButton = getContinueButton();
 
     buttons.forEach(function (button) {
+      if (!RANK_PURCHASES_ENABLED) {
+        button.disabled = true;
+        button.setAttribute("aria-disabled", "true");
+      }
+
       button.addEventListener("click", handleBuyClick);
     });
 
