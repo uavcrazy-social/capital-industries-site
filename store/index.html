@@ -14,6 +14,7 @@
 <link href="/store/" rel="prefetch"/>
 <meta content="#ff8a18" name="theme-color"/>
 <link href="/assets/site.css" rel="stylesheet"/>
+<script defer src="https://js.tebex.io/v/1.js"></script>
 </head>
 <body>
 <header class="site-header">
@@ -63,6 +64,20 @@
 </div>
 </section>
 <section class="site-shell section">
+<div class="panel checkout-panel" data-reveal="">
+<div>
+<p class="eyebrow">Checkout</p>
+<h2 class="link-title">Enter your Minecraft username before buying.</h2>
+<p class="link-text">
+            Tebex uses this username to attach the rank to the correct player.
+          </p>
+</div>
+<div class="checkout-controls">
+<label class="store-label" for="minecraft-username">Minecraft Java username</label>
+<input autocomplete="username" class="store-input" id="minecraft-username" maxlength="16" name="minecraft-username" placeholder="Example: Steve" type="text"/>
+<p class="checkout-status" id="checkout-status" aria-live="polite"></p>
+</div>
+</div>
 <div aria-label="Monthly server ranks" class="rank-grid">
 <article class="rank-card rank-member" data-reveal="">
 <h2 class="rank-name">Member</h2>
@@ -81,10 +96,10 @@
 <li><code>/hat</code></li>
 </ul>
 <div class="rank-actions">
-<a class="button button-primary" href="https://shop.capitalindustries.net">
+<button class="button button-primary" data-tebex-package="member" type="button">
 <img alt="" class="button-icon" src="/assets/icons/store.svg"/>
               Buy Member
-            </a>
+            </button>
 </div>
 </article>
 <article class="rank-card rank-premium" data-reveal="">
@@ -104,10 +119,10 @@
 <li>Size changer</li>
 </ul>
 <div class="rank-actions">
-<a class="button button-primary" href="https://shop.capitalindustries.net">
+<button class="button button-primary" data-tebex-package="premium" type="button">
 <img alt="" class="button-icon" src="/assets/icons/store.svg"/>
               Buy Premium
-            </a>
+            </button>
 </div>
 </article>
 <article class="rank-card rank-elite" data-reveal="">
@@ -125,10 +140,10 @@
 <li>Elite badge</li>
 </ul>
 <div class="rank-actions">
-<a class="button button-primary" href="https://shop.capitalindustries.net">
+<button class="button button-primary" data-tebex-package="elite" type="button">
 <img alt="" class="button-icon" src="/assets/icons/store.svg"/>
               Buy Elite
-            </a>
+            </button>
 </div>
 </article>
 </div>
@@ -152,6 +167,8 @@
 </nav>
 </div>
 </footer>
+<tebex-checkout></tebex-checkout>
+<script defer src="/assets/tebex-store.js"></script>
 <script defer="" src="/assets/site.js"></script>
 </body>
 </html>

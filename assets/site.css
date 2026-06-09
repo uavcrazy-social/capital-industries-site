@@ -565,3 +565,60 @@ h1, h2, h3, p { margin-top: 0; }
   object-fit: contain;
   border-radius: 5px;
 }
+
+
+.checkout-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 360px);
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.checkout-controls {
+  display: grid;
+  gap: 8px;
+}
+
+.store-label {
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.store-input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.055);
+  font: inherit;
+  outline: none;
+}
+
+.store-input:focus {
+  border-color: rgba(255, 138, 24, 0.72);
+  box-shadow: 0 0 0 4px rgba(255, 138, 24, 0.14);
+}
+
+.checkout-status {
+  min-height: 1.4em;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.button[disabled] {
+  cursor: wait;
+  opacity: 0.66;
+}
+
+@media (max-width: 720px) {
+  .checkout-panel {
+    grid-template-columns: 1fr;
+  }
+}
