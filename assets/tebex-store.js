@@ -6,11 +6,11 @@
    * Public token and package IDs are public identifiers. Do not put a private
    * key, secret key, webhook secret, or API secret in this browser file.
    */
-  var TEBEX_PUBLIC_TOKEN = "REPLACE_WITH_TEBEX_PUBLIC_TOKEN";
+  var TEBEX_PUBLIC_TOKEN = "13bmd-225b100e916451ed82c9e96183f8929d044f437c";
   var PACKAGE_IDS = {
-    member: "REPLACE_WITH_MEMBER_PACKAGE_ID",
-    premium: "REPLACE_WITH_PREMIUM_PACKAGE_ID",
-    elite: "REPLACE_WITH_ELITE_PACKAGE_ID"
+    member: "7490093",
+    premium: "7490099",
+    elite: "7490104"
   };
 
   var USERNAME_PATTERN = /^[A-Za-z0-9_]{3,16}$/;
