@@ -27,13 +27,13 @@
 </span>
 </a>
 <nav aria-label="Primary navigation" class="nav-links">
-<a class="nav-link" href="/download"><img alt="" class="nav-icon" src="/assets/icons/download.svg"/> Download</a>
-<a class="nav-link nav-link-active" href="/store"><img alt="" class="nav-icon" src="/assets/icons/store.svg"/> Store</a>
-<a class="nav-link" href="/account"><img alt="" class="nav-icon" src="/assets/icons/community.svg"/> Account</a>
-<a class="nav-link" href="https://map.capitalindustries.net/" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/bluemap-logo.png"/> Map</a>
-<a class="nav-link" href="https://discord.gg/jj7fFEYYfk" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/discord-logo.png"/> Discord</a>
-<a class="nav-link" href="https://ko-fi.com/dtmpro621" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/icons/kofi.svg"/> Donate</a>
-<a class="nav-link nav-link-cta" href="/download"><img alt="" class="nav-icon nav-icon-play" src="/assets/icons/play.svg"/> Play</a>
+<a class="nav-link nav-link-cta" data-nav-key="play" href="/download"><img alt="" class="nav-icon nav-icon-play" src="/assets/icons/play.svg"/> Play</a>
+<a class="nav-link" data-nav-key="map" href="https://map.capitalindustries.net/" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/bluemap-logo.png"/> Map</a>
+<a class="nav-link" data-nav-key="discord" href="https://discord.gg/jj7fFEYYfk" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/discord-logo.png"/> Discord</a>
+<a class="nav-link" data-nav-key="donate" href="https://ko-fi.com/dtmpro621" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/icons/kofi.svg"/> Donate</a>
+<a class="nav-link nav-link-cta" data-nav-key="store" href="/store"><img alt="" class="nav-icon" src="/assets/icons/store.svg"/> Store</a>
+<span class="nav-divider" aria-hidden="true"></span>
+<div class="nav-account-slot" id="nav-account-slot"></div>
 </nav>
 </div>
 </header>
@@ -154,7 +154,7 @@ Buy Elite
 </div>
 <div class="notice store-auth-notice" data-reveal="" hidden id="store-auth-notice">
 <strong>Account required.</strong>
-<a href="/account/?return=/store/">Continue with Google or Discord</a> and link your
+<a href="/account/?return=/store/&reason=checkout">Login</a> and link your
 in-game username before buying a rank.
 </div>
 <div class="notice" data-reveal="">
@@ -211,6 +211,7 @@ Continue to secure checkout
 </div>
 <tebex-checkout></tebex-checkout>
 <script src="/assets/supabase-config.js"></script>
+<script type="module" src="/assets/site-nav.js"></script>
 <script type="module" src="/assets/auth-client.js"></script>
 <script defer src="/assets/tebex-store.js"></script>
 <script defer="" src="/assets/site.js"></script>

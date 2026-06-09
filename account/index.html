@@ -26,13 +26,13 @@
 </span>
 </a>
 <nav aria-label="Primary navigation" class="nav-links">
-<a class="nav-link" href="/download"><img alt="" class="nav-icon" src="/assets/icons/download.svg"/> Download</a>
-<a class="nav-link" href="/store"><img alt="" class="nav-icon" src="/assets/icons/store.svg"/> Store</a>
-<a class="nav-link nav-link-active" href="/account"><img alt="" class="nav-icon" src="/assets/icons/community.svg"/> Account</a>
-<a class="nav-link" href="https://map.capitalindustries.net/" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/bluemap-logo.png"/> Map</a>
-<a class="nav-link" href="https://discord.gg/jj7fFEYYfk" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/discord-logo.png"/> Discord</a>
-<a class="nav-link" href="https://ko-fi.com/dtmpro621" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/icons/kofi.svg"/> Donate</a>
-<a class="nav-link nav-link-cta" href="/download"><img alt="" class="nav-icon nav-icon-play" src="/assets/icons/play.svg"/> Play</a>
+<a class="nav-link nav-link-cta" data-nav-key="play" href="/download"><img alt="" class="nav-icon nav-icon-play" src="/assets/icons/play.svg"/> Play</a>
+<a class="nav-link" data-nav-key="map" href="https://map.capitalindustries.net/" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/bluemap-logo.png"/> Map</a>
+<a class="nav-link" data-nav-key="discord" href="https://discord.gg/jj7fFEYYfk" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/discord-logo.png"/> Discord</a>
+<a class="nav-link" data-nav-key="donate" href="https://ko-fi.com/dtmpro621" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/icons/kofi.svg"/> Donate</a>
+<a class="nav-link nav-link-cta" data-nav-key="store" href="/store"><img alt="" class="nav-icon" src="/assets/icons/store.svg"/> Store</a>
+<span class="nav-divider" aria-hidden="true"></span>
+<div class="nav-account-slot" id="nav-account-slot"></div>
 </nav>
 </div>
 </header>
@@ -50,15 +50,20 @@ Continue with Google or Discord, then confirm your current Minecraft Java userna
 <div class="notice account-service-warning" hidden id="account-service-warning" data-reveal="">
 Account services are not available right now.
 </div>
-<div class="account-grid" data-reveal="">
+<div class="notice" hidden id="account-checkout-notice" data-reveal="">
+<strong>Account required to buy ranks.</strong> Continue with Google or Discord below, then link your Minecraft username before returning to the store.
+</div>
+<div class="account-layout" data-reveal="">
 <article class="panel account-panel" id="auth-panel">
-<h2 class="link-title">Account access</h2>
+<h2 class="link-title">Login or create account</h2>
 <p class="link-text">Public login is Google or Discord only.</p>
 <div class="account-oauth-actions">
-<button class="button button-primary oauth-button oauth-google" id="google-sign-in" type="button">
+<button class="button oauth-button oauth-google" id="google-sign-in" type="button">
+<img alt="" class="oauth-icon" src="/assets/icons/google.svg"/>
 Continue with Google
 </button>
 <button class="button oauth-button oauth-discord" id="discord-sign-in" type="button">
+<img alt="" class="oauth-icon" src="/assets/icons/discord-oauth.svg"/>
 Continue with Discord
 </button>
 </div>
@@ -113,17 +118,6 @@ I confirm <strong id="profile-username-preview">this username</strong> is my cur
 </form>
 <a class="button button-primary" href="/store/">Go to store</a>
 </article>
-<aside class="panel account-panel account-secondary">
-<p class="eyebrow">Account help</p>
-<h2 class="link-title">One exact Java name</h2>
-<ul class="perk-list">
-<li>Continue with Google or Discord to access your account.</li>
-<li>We verify your username exists via Mojang before saving it.</li>
-<li>Ranks are purchased on the store after your username is linked.</li>
-<li>For help, contact support in Discord.</li>
-</ul>
-<a class="button button-ghost" href="/store">Go to ranks</a>
-</aside>
 </div>
 </section>
 </main>
@@ -142,6 +136,7 @@ I confirm <strong id="profile-username-preview">this username</strong> is my cur
 </div>
 </footer>
 <script src="/assets/supabase-config.js"></script>
+<script type="module" src="/assets/site-nav.js"></script>
 <script type="module" src="/assets/account.js"></script>
 <script defer src="/assets/site.js"></script>
 </body>

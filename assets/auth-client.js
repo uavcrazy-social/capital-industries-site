@@ -16,7 +16,26 @@ const readyPromise = new Promise(function (resolve) {
 });
 
 function accountRedirectUrl() {
-  return window.location.origin + "/account/";
+  const params = new URLSearchParams(window.location.search);
+  const returnPath = params.get("return");
+  const reason = params.get("reason");
+  const setup = params.get("setup");
+  const redirectParams = new URLSearchParams();
+
+  if (returnPath && returnPath.charAt(0) === "/" && returnPath.indexOf("//") !== 0) {
+    redirectParams.set("return", returnPath);
+  }
+
+  if (reason) {
+    redirectParams.set("reason", reason);
+  }
+
+  if (setup === "1") {
+    redirectParams.set("setup", "1");
+  }
+
+  const query = redirectParams.toString();
+  return window.location.origin + "/account/" + (query ? "?" + query : "");
 }
 
 async function lookupMinecraftUsername(username) {
@@ -195,7 +214,10 @@ async function boot() {
       ready: function () {
         return readyPromise;
       },
-      lookupMinecraftUsername: lookupMinecraftUsername
+      lookupMinecraftUsername: lookupMinecraftUsername,
+      onAuthStateChange: function () {
+        return { data: { subscription: { unsubscribe: function () {} } } };
+      }
     };
     readyResolve();
     return;
@@ -248,7 +270,10 @@ boot().catch(function (error) {
     ready: function () {
       return readyPromise;
     },
-    lookupMinecraftUsername: lookupMinecraftUsername
+    lookupMinecraftUsername: lookupMinecraftUsername,
+    onAuthStateChange: function () {
+      return { data: { subscription: { unsubscribe: function () {} } } };
+    }
   };
   readyResolve();
 });

@@ -420,7 +420,8 @@
   }
 
   function redirectToAccount(setup) {
-    var url = "/account/?return=" + encodeURIComponent("/store/");
+    var url =
+      "/account/?return=" + encodeURIComponent("/store/") + "&reason=checkout";
 
     if (setup) {
       url += "&setup=1";

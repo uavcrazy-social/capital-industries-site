@@ -123,8 +123,28 @@ async function renderSignedIn(user, profile) {
   }
 }
 
+function showCheckoutNotice() {
+  const notice = byId("account-checkout-notice");
+  const params = new URLSearchParams(window.location.search);
+
+  if (!notice) {
+    return;
+  }
+
+  const needsAccount = params.get("reason") === "checkout";
+
+  notice.hidden = !needsAccount;
+
+  if (needsAccount && params.get("setup") === "1") {
+    notice.innerHTML =
+      "<strong>Link your Minecraft username to buy ranks.</strong> Confirm your in-game name below, then return to the store.";
+  }
+}
+
 async function refreshAccountView() {
   const warning = byId("account-service-warning");
+
+  showCheckoutNotice();
 
   await window.CapitalAuth.ready();
 
@@ -327,9 +347,11 @@ async function boot() {
     });
   }
 
-  window.CapitalAuth.onAuthStateChange(function () {
-    refreshAccountView();
-  });
+  if (typeof window.CapitalAuth.onAuthStateChange === "function") {
+    window.CapitalAuth.onAuthStateChange(function () {
+      refreshAccountView();
+    });
+  }
 
   await refreshAccountView();
 }
