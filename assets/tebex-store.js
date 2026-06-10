@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  var RANK_PURCHASES_ENABLED = true;
+  var RANK_PURCHASES_ENABLED = false;
 
   var TEBEX_PUBLIC_TOKEN = String(window.CAPITAL_TEBEX_PUBLIC_TOKEN || "13bmd-225b100e916451ed82c9e96183f8929d044f437c");
   var PACKAGE_IDS = {
@@ -318,6 +318,18 @@
         }
       }
 
+      if (
+        !RANK_PURCHASES_ENABLED &&
+        button.getAttribute("data-rank-action") !== "tebex-manage" &&
+        button.getAttribute("data-rank-action") !== "owned"
+      ) {
+        button.textContent = "Temporarily unavailable";
+        button.classList.add("button-ghost", "button-rank-blocked");
+        button.classList.remove("button-primary");
+        button.setAttribute("data-rank-action", "disabled");
+        disabled = true;
+      }
+
       button.disabled = disabled;
     });
   }
@@ -498,6 +510,10 @@
   }
 
   async function assertCanPurchaseRank(packageKey) {
+    if (!RANK_PURCHASES_ENABLED) {
+      throw new Error("Rank purchases are temporarily unavailable. Please check back soon.");
+    }
+
     if (
       activeSubscription &&
       activeSubscription.status === "active"

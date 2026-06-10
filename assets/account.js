@@ -182,8 +182,26 @@ async function promptUsernameSetupIfNeeded() {
   }
 }
 
+function updateAccountHero(signedIn) {
+  if (signedIn) {
+    setText("account-hero-title", "Account");
+    setText(
+      "account-hero-tagline",
+      "Manage your profile, linked Minecraft username, and subscriptions."
+    );
+    return;
+  }
+
+  setText("account-hero-title", "Sign in");
+  setText(
+    "account-hero-tagline",
+    "Use Google or Discord to link your Minecraft username and buy ranks."
+  );
+}
+
 async function renderSignedOut() {
   finishAccountLoading();
+  updateAccountHero(false);
   setPanelHidden("account-session-panel", true);
   setPanelHidden("auth-panel", false);
 
@@ -203,6 +221,7 @@ async function renderSignedIn(user, profile, options) {
   const needsSetup = Boolean(options && options.needsSetup);
 
   finishAccountLoading();
+  updateAccountHero(true);
   setPanelHidden("auth-panel", true);
   setPanelHidden("account-session-panel", false);
 
@@ -224,7 +243,7 @@ async function renderSignedIn(user, profile, options) {
   await promptUsernameSetupIfNeeded();
 }
 
-function showCheckoutNotice() {
+function showCheckoutNotice(options) {
   const notice = byId("account-checkout-notice");
   const params = new URLSearchParams(window.location.search);
 
@@ -232,14 +251,25 @@ function showCheckoutNotice() {
     return;
   }
 
-  const needsAccount = params.get("reason") === "checkout";
+  const needsCheckout = params.get("reason") === "checkout";
+  const signedIn = Boolean(options && options.signedIn);
+  const complete = Boolean(options && options.complete);
 
-  notice.hidden = !needsAccount;
+  if (!needsCheckout || (signedIn && complete)) {
+    notice.hidden = true;
+    return;
+  }
 
-  if (needsAccount && params.get("setup") === "1") {
+  notice.hidden = false;
+
+  if (params.get("setup") === "1" || (signedIn && !complete)) {
     notice.innerHTML =
       "<strong>Link your Minecraft username to buy ranks.</strong> Use the setup popup to confirm your in-game name, then return to the store.";
+    return;
   }
+
+  notice.innerHTML =
+    "<strong>Account required to buy ranks.</strong> Sign in below, confirm your in-game name in the popup, then return to the store.";
 }
 
 function setAccountLoading(loading) {
@@ -277,13 +307,12 @@ async function refreshAccountViewInner() {
     setAccountLoading(true);
   }
 
-  showCheckoutNotice();
-
   if (!window.CapitalAuth || typeof window.CapitalAuth.ready !== "function") {
     if (warning) {
       warning.hidden = false;
       warning.textContent = "Account services failed to load. Refresh the page.";
     }
+    showCheckoutNotice({ signedIn: false, complete: false });
     await renderSignedOut();
     return;
   }
@@ -296,6 +325,7 @@ async function refreshAccountViewInner() {
       warning.textContent =
         "Account sign-in is temporarily unavailable. Please try again later.";
     }
+    showCheckoutNotice({ signedIn: false, complete: false });
     await renderSignedOut();
     return;
   }
@@ -307,6 +337,7 @@ async function refreshAccountViewInner() {
   const user = await window.CapitalAuth.getSessionUser();
 
   if (!user) {
+    showCheckoutNotice({ signedIn: false, complete: false });
     await renderSignedOut();
     return;
   }
@@ -315,6 +346,7 @@ async function refreshAccountViewInner() {
   const complete = await window.CapitalAuth.hasCompleteProfile();
   const forceSetup = new URLSearchParams(window.location.search).get("setup") === "1";
 
+  showCheckoutNotice({ signedIn: true, complete: complete });
   await renderSignedIn(user, profile, {
     needsSetup: !complete || forceSetup
   });
