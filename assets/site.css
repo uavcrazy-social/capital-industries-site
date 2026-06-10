@@ -301,6 +301,10 @@ code { color: var(--orange-bright); font-family: "SFMono-Regular", Consolas, "Li
   min-height: 220px;
 }
 
+.account-loading-panel[hidden] {
+  display: none !important;
+}
+
 .oauth-icon {
   display: block;
   width: 20px;

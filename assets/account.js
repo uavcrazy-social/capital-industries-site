@@ -1,5 +1,6 @@
 const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,16}$/;
 let initialAccountLoad = true;
+let refreshInFlight = null;
 
 function byId(id) {
   return document.getElementById(id);
@@ -245,6 +246,7 @@ async function promptUsernameSetupIfNeeded() {
 }
 
 async function renderSignedOut() {
+  finishAccountLoading();
   setPanelHidden("account-session-panel", true);
   setPanelHidden("auth-panel", false);
 
@@ -256,6 +258,7 @@ async function renderSignedOut() {
 async function renderSignedIn(user, profile, options) {
   const needsSetup = Boolean(options && options.needsSetup);
 
+  finishAccountLoading();
   setPanelHidden("auth-panel", true);
   setPanelHidden("account-session-panel", false);
 
@@ -314,20 +317,35 @@ function showCheckoutNotice() {
 }
 
 function setAccountLoading(loading) {
-  setPanelHidden("account-loading-panel", !loading);
-
   const loadingPanel = byId("account-loading-panel");
 
   if (loadingPanel) {
+    loadingPanel.hidden = !loading;
     loadingPanel.setAttribute("aria-busy", loading ? "true" : "false");
   }
 }
 
-async function refreshAccountView() {
-  const warning = byId("account-service-warning");
-  const showLoadingGate = initialAccountLoad;
+function finishAccountLoading() {
+  setAccountLoading(false);
+  initialAccountLoad = false;
+}
 
-  if (showLoadingGate) {
+async function refreshAccountView() {
+  if (refreshInFlight) {
+    return refreshInFlight;
+  }
+
+  refreshInFlight = refreshAccountViewInner().finally(function () {
+    refreshInFlight = null;
+  });
+
+  return refreshInFlight;
+}
+
+async function refreshAccountViewInner() {
+  const warning = byId("account-service-warning");
+
+  if (initialAccountLoad) {
     setPanelHidden("auth-panel", true);
     setPanelHidden("account-session-panel", true);
     setAccountLoading(true);
@@ -335,52 +353,45 @@ async function refreshAccountView() {
 
   showCheckoutNotice();
 
-  try {
-    if (!window.CapitalAuth || typeof window.CapitalAuth.ready !== "function") {
-      if (warning) {
-        warning.hidden = false;
-        warning.textContent = "Account services failed to load. Refresh the page.";
-      }
-      await renderSignedOut();
-      return;
-    }
-
-    await window.CapitalAuth.ready();
-
-    if (!window.CapitalAuth.configured) {
-      if (warning) {
-        warning.hidden = false;
-        warning.textContent =
-          "Account sign-in is temporarily unavailable. Please try again later.";
-      }
-      await renderSignedOut();
-      return;
-    }
-
+  if (!window.CapitalAuth || typeof window.CapitalAuth.ready !== "function") {
     if (warning) {
-      warning.hidden = true;
+      warning.hidden = false;
+      warning.textContent = "Account services failed to load. Refresh the page.";
     }
-
-    const user = await window.CapitalAuth.getSessionUser();
-
-    if (!user) {
-      await renderSignedOut();
-      return;
-    }
-
-    const profile = await window.CapitalAuth.getProfile();
-    const complete = await window.CapitalAuth.hasCompleteProfile();
-    const forceSetup = new URLSearchParams(window.location.search).get("setup") === "1";
-
-    await renderSignedIn(user, profile, {
-      needsSetup: !complete || forceSetup
-    });
-  } finally {
-    if (showLoadingGate) {
-      setAccountLoading(false);
-      initialAccountLoad = false;
-    }
+    await renderSignedOut();
+    return;
   }
+
+  await window.CapitalAuth.ready();
+
+  if (!window.CapitalAuth.configured) {
+    if (warning) {
+      warning.hidden = false;
+      warning.textContent =
+        "Account sign-in is temporarily unavailable. Please try again later.";
+    }
+    await renderSignedOut();
+    return;
+  }
+
+  if (warning) {
+    warning.hidden = true;
+  }
+
+  const user = await window.CapitalAuth.getSessionUser();
+
+  if (!user) {
+    await renderSignedOut();
+    return;
+  }
+
+  const profile = await window.CapitalAuth.getProfile();
+  const complete = await window.CapitalAuth.hasCompleteProfile();
+  const forceSetup = new URLSearchParams(window.location.search).get("setup") === "1";
+
+  await renderSignedIn(user, profile, {
+    needsSetup: !complete || forceSetup
+  });
 }
 
 function updateProfileSubmitState() {
@@ -567,6 +578,7 @@ function scrollToSubscriptionManage() {
 
 boot().catch(function (error) {
   console.error(error);
+  finishAccountLoading();
   const warning = byId("account-service-warning");
 
   if (warning) {
