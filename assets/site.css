@@ -1233,7 +1233,7 @@ body.modal-open {
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
 }
 
@@ -1247,15 +1247,25 @@ body.modal-open {
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   padding: 0;
-  border: 1px solid rgba(255, 138, 24, 0.35);
-  border-radius: 10px;
-  color: var(--orange-bright, #ff8a18);
-  background: rgba(255, 138, 24, 0.08);
+  border: 0;
+  border-radius: 8px;
+  color: var(--muted-2);
+  background: transparent;
+  font: inherit;
+  line-height: 1;
   cursor: pointer;
-  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: color 140ms ease, background 140ms ease, transform 140ms ease;
+}
+
+.account-meta-edit svg {
+  display: block;
+  width: 14px;
+  height: 14px;
 }
 
 .account-meta-edit[hidden] {
@@ -1264,10 +1274,10 @@ body.modal-open {
 
 .account-meta-edit:hover,
 .account-meta-edit:focus-visible {
-  color: var(--text);
-  border-color: rgba(255, 138, 24, 0.45);
-  background: rgba(255, 138, 24, 0.08);
+  color: var(--orange-bright);
+  background: rgba(255, 255, 255, 0.06);
   outline: none;
+  transform: translateY(-1px);
 }
 
 .username-edit-modal .store-modal-card {
