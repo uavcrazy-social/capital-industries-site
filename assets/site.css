@@ -628,9 +628,11 @@ h1, h2, h3, p { margin-top: 0; }
   background: rgba(255, 138, 24, 0.1);
   cursor: default;
 }
-.button-rank-blocked {
-  cursor: not-allowed;
-  opacity: 0.72;
+.button-rank-manage {
+  width: 100%;
+}
+.account-subscription-actions {
+  margin-top: 16px;
 }
 .store-active-rank-banner {
   margin-top: 0;

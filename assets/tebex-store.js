@@ -3,7 +3,7 @@
 
   var RANK_PURCHASES_ENABLED = true;
 
-  var TEBEX_PUBLIC_TOKEN = "13bmd-225b100e916451ed82c9e96183f8929d044f437c";
+  var TEBEX_PUBLIC_TOKEN = String(window.CAPITAL_TEBEX_PUBLIC_TOKEN || "13bmd-225b100e916451ed82c9e96183f8929d044f437c");
   var PACKAGE_IDS = {
     member: "7490093",
     premium: "7490099",
@@ -58,6 +58,8 @@
 
   var linkedUsername = "";
   var activeSubscription = null;
+  var subscriptionPollTimer = 0;
+  var checkoutReturnPending = false;
   function waitForAuth() {
     return new Promise(function (resolve) {
       function check() {
@@ -117,6 +119,13 @@
           : null;
 
       setAuthNoticeVisible(!complete);
+
+      if (activeSubscription) {
+        checkoutReturnPending = false;
+        stopSubscriptionPoll();
+        notifySubscriptionUpdated();
+      }
+
       updateRankUI(complete, activeSubscription);
       updateActiveRankBanner(activeSubscription);
       updateConfirmState();
@@ -126,6 +135,58 @@
       updateRankUI(false, null);
       updateActiveRankBanner(null);
     }
+  }
+
+  function notifySubscriptionUpdated() {
+    window.dispatchEvent(new CustomEvent("capital:subscription-updated"));
+
+    try {
+      window.localStorage.setItem("capital:subscription-updated", String(Date.now()));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  function isCheckoutReturnComplete() {
+    return new URLSearchParams(window.location.search).get("checkout") === "complete";
+  }
+
+  function stopSubscriptionPoll() {
+    if (subscriptionPollTimer) {
+      window.clearInterval(subscriptionPollTimer);
+      subscriptionPollTimer = 0;
+    }
+  }
+
+  function startSubscriptionPoll() {
+    if (subscriptionPollTimer || activeSubscription) {
+      return;
+    }
+
+    var attempts = 0;
+    var maxAttempts = 24;
+
+    subscriptionPollTimer = window.setInterval(function () {
+      attempts += 1;
+
+      refreshStoreAccess().finally(function () {
+        if (activeSubscription || attempts >= maxAttempts) {
+          stopSubscriptionPoll();
+        }
+      });
+    }, 2500);
+  }
+
+  function maybeStartPostCheckoutSync() {
+    if (!checkoutReturnPending) {
+      return;
+    }
+
+    refreshStoreAccess().finally(function () {
+      if (!activeSubscription) {
+        startSubscriptionPoll();
+      }
+    });
   }
 
   function cleanCheckoutReturnParam() {
@@ -200,7 +261,14 @@
     buttons.forEach(function (button) {
       rememberButtonDefault(button);
       restoreButtonDefault(button);
-      button.classList.remove("button-rank-owned", "button-rank-blocked", "button-primary");
+      button.classList.remove(
+        "button-rank-owned",
+        "button-rank-manage",
+        "button-rank-blocked",
+        "button-primary",
+        "button-ghost"
+      );
+      button.removeAttribute("data-rank-action");
 
       var packageKey = button.getAttribute("data-tebex-package");
       var card = getRankCard(packageKey);
@@ -214,6 +282,7 @@
           disabled = true;
           button.textContent = "Your current plan";
           button.classList.add("button-rank-owned");
+          button.setAttribute("data-rank-action", "owned");
 
           if (card) {
             card.classList.add("rank-card-active");
@@ -228,9 +297,10 @@
             }
           }
         } else {
-          disabled = true;
+          disabled = false;
           button.textContent = "Cancel " + activeName + " first";
-          button.classList.add("button-rank-blocked");
+          button.classList.add("button-ghost", "button-rank-manage");
+          button.setAttribute("data-rank-action", "manage");
 
           if (card) {
             card.classList.add("rank-card-blocked");
@@ -239,7 +309,7 @@
             note.textContent =
               "You already have " +
               activeName +
-              " active. Cancel your current plan before buying another rank.";
+              " active. Manage your subscription on the account page before buying another rank.";
             var actions = card.querySelector(".rank-actions");
             if (actions) {
               actions.insertBefore(note, actions.firstChild);
@@ -620,6 +690,16 @@
     }
 
     var trigger = event.currentTarget;
+    var rankAction = trigger.getAttribute("data-rank-action");
+
+    if (rankAction === "owned") {
+      return;
+    }
+
+    if (rankAction === "manage") {
+      window.location.href = "/account/#subscription-manage";
+      return;
+    }
 
     if (trigger.disabled) {
       return;
@@ -724,6 +804,29 @@
       refreshStoreAccess();
     });
 
+    window.addEventListener("capital:subscription-updated", function () {
+      refreshStoreAccess();
+    });
+
+    window.addEventListener("storage", function (event) {
+      if (event.key === "capital:subscription-updated") {
+        refreshStoreAccess();
+      }
+    });
+
+    window.addEventListener("pageshow", function () {
+      maybeStartPostCheckoutSync();
+      refreshStoreAccess();
+    });
+
+    window.addEventListener("focus", function () {
+      if (checkoutReturnPending || activeSubscription) {
+        refreshStoreAccess();
+      }
+    });
+
+    checkoutReturnPending = isCheckoutReturnComplete();
+
     waitForAuth().then(function () {
       if (typeof window.CapitalAuth.onAuthStateChange === "function") {
         window.CapitalAuth.onAuthStateChange(function () {
@@ -732,6 +835,8 @@
       }
 
       return refreshStoreAccess();
+    }).then(function () {
+      maybeStartPostCheckoutSync();
     }).catch(function (error) {
       console.error(error);
     });

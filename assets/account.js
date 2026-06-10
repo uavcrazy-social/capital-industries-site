@@ -178,7 +178,16 @@ async function renderAccountDetails(user) {
     }
 
     setText("account-subscription-meta", metaParts.join(" · "));
+
+    const cancelButton = byId("cancel-subscription-button");
+    if (cancelButton) {
+      cancelButton.hidden = false;
+    }
   } else {
+    const cancelButton = byId("cancel-subscription-button");
+    if (cancelButton) {
+      cancelButton.hidden = true;
+    }
     if (subscriptionEmpty) {
       subscriptionEmpty.hidden = false;
     }
@@ -423,6 +432,19 @@ async function boot() {
 
   bindProfileForm();
 
+  const cancelSubscriptionButton = byId("cancel-subscription-button");
+
+  if (cancelSubscriptionButton) {
+    cancelSubscriptionButton.addEventListener("click", function () {
+      if (window.CapitalTebexPortal && typeof window.CapitalTebexPortal.launch === "function") {
+        window.CapitalTebexPortal.launch();
+        return;
+      }
+
+      window.open("https://checkout.tebex.io/", "_blank", "noopener,noreferrer");
+    });
+  }
+
   const googleButton = byId("google-sign-in");
   const discordButton = byId("discord-sign-in");
   const logoutButton = byId("logout-button");
@@ -464,7 +486,36 @@ async function boot() {
     refreshAccountView();
   });
 
+  window.addEventListener("capital:subscription-updated", function () {
+    refreshAccountView();
+  });
+
+  window.addEventListener("storage", function (event) {
+    if (event.key === "capital:subscription-updated") {
+      refreshAccountView();
+    }
+  });
+
+  window.addEventListener("pageshow", function () {
+    refreshAccountView();
+  });
+
   await refreshAccountView();
+  scrollToSubscriptionManage();
+}
+
+function scrollToSubscriptionManage() {
+  if (window.location.hash !== "#subscription-manage") {
+    return;
+  }
+
+  const target = byId("subscription-manage");
+
+  if (target) {
+    window.requestAnimationFrame(function () {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
 }
 
 boot().catch(function (error) {
