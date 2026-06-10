@@ -75,8 +75,16 @@
 
     ticking = true;
     window.requestAnimationFrame(function () {
-      var y = Math.round(window.scrollY / -3);
-      document.documentElement.style.setProperty("--parallax-y", y + "px");
+      var scrollY = window.scrollY;
+      var docHeight = Math.max(
+        document.documentElement.scrollHeight,
+        document.body ? document.body.scrollHeight : 0
+      );
+      var glowY = Math.round(scrollY / -2);
+      var coverage = docHeight + Math.abs(glowY) + window.innerHeight;
+
+      document.documentElement.style.setProperty("--parallax-glow-y", glowY + "px");
+      document.documentElement.style.setProperty("--ambient-height", coverage + "px");
       ticking = false;
     });
   }
@@ -174,4 +182,5 @@
   initializeNavigationEnhancements();
   updateParallax();
   window.addEventListener("scroll", updateParallax, { passive: true });
+  window.addEventListener("resize", updateParallax, { passive: true });
 }());
