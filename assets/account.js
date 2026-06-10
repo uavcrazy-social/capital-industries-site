@@ -1,6 +1,11 @@
 const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,16}$/;
+const EDIT_MODAL_CLOSE_DELAY_MS = 190;
 let initialAccountLoad = true;
 let refreshInFlight = null;
+let editModalEl = null;
+let editModalBusy = false;
+let editModalCloseTimer = 0;
+let editModalBound = false;
 
 function byId(id) {
   return document.getElementById(id);
@@ -185,6 +190,8 @@ async function renderSignedOut() {
   if (window.CapitalProfileSetup && typeof window.CapitalProfileSetup.close === "function") {
     window.CapitalProfileSetup.close(true);
   }
+
+  closeEditModal(true);
 }
 
 async function renderSignedIn(user, profile, options) {
@@ -197,38 +204,15 @@ async function renderSignedIn(user, profile, options) {
   setText("account-summary", "Signed in as " + (profile?.minecraft_username || "Account"));
   setText("account-linked-username", profile?.minecraft_username || "—");
 
-  const profileForm = byId("profile-form");
-  const profileSection = byId("profile-manage-section");
-  const changeUsernameButton = byId("change-username-button");
+  const editUsernameButton = byId("edit-username-button");
 
-  if (profileForm) {
-    profileForm.hidden = true;
-  }
-
-  if (profileSection) {
-    profileSection.hidden = needsSetup;
-  }
-
-  if (changeUsernameButton) {
-    changeUsernameButton.hidden = needsSetup;
-    changeUsernameButton.textContent = "Change username";
+  if (editUsernameButton) {
+    editUsernameButton.hidden = needsSetup;
   }
 
   await renderAccountDetails(user);
 
   if (!needsSetup && profile) {
-    const usernameInput = byId("profile-minecraft-username");
-    const confirmedInput = byId("profile-username-confirmed");
-
-    if (usernameInput) {
-      usernameInput.value = profile.minecraft_username || "";
-    }
-
-    if (confirmedInput) {
-      confirmedInput.checked = Boolean(profile.username_confirmed);
-    }
-
-    updateProfileSubmitState();
     return;
   }
 
@@ -331,11 +315,15 @@ async function refreshAccountViewInner() {
   });
 }
 
-function updateProfileSubmitState() {
-  const input = byId("profile-minecraft-username");
-  const confirmed = byId("profile-username-confirmed");
-  const submit = byId("profile-submit");
-  const preview = byId("profile-username-preview");
+function setEditModalStatus(message, type) {
+  setStatus("edit-username-status", message, type);
+}
+
+function updateEditSubmitState() {
+  const input = byId("edit-username-input");
+  const confirmed = byId("edit-username-confirmed");
+  const submit = byId("edit-username-submit");
+  const preview = byId("edit-username-preview");
   const username = input ? input.value.trim() : "";
   const valid = USERNAME_PATTERN.test(username);
 
@@ -344,59 +332,181 @@ function updateProfileSubmitState() {
   }
 
   if (submit) {
-    submit.disabled = !valid || !(confirmed && confirmed.checked);
+    submit.disabled = editModalBusy || !valid || !(confirmed && confirmed.checked);
   }
 }
 
-function bindProfileForm() {
-  const form = byId("profile-form");
-  const input = byId("profile-minecraft-username");
-  const confirmed = byId("profile-username-confirmed");
-  const changeUsernameButton = byId("change-username-button");
-
-  if (changeUsernameButton && form) {
-    changeUsernameButton.addEventListener("click", function () {
-      form.hidden = !form.hidden;
-      changeUsernameButton.textContent = form.hidden ? "Change username" : "Hide username form";
-    });
+function ensureEditModal() {
+  if (editModalEl) {
+    return editModalEl;
   }
+
+  document.body.insertAdjacentHTML(
+    "beforeend",
+    '<div aria-hidden="true" aria-labelledby="edit-username-title" aria-modal="true" class="store-modal username-edit-modal" hidden id="edit-username-modal" role="dialog">' +
+      '<div class="store-modal-backdrop" data-modal-dismiss=""></div>' +
+      '<div class="store-modal-card" role="document">' +
+      '<button aria-label="Close username dialog" class="store-modal-close" data-modal-dismiss="" type="button">×</button>' +
+      '<div class="store-modal-header">' +
+      '<h2 class="store-modal-title" id="edit-username-title">Change username</h2>' +
+      '<p class="store-modal-subtitle">Enter your exact current Minecraft Java username.</p>' +
+      "</div>" +
+      '<form class="account-form" id="edit-username-form" novalidate>' +
+      '<label class="store-label" for="edit-username-input">Minecraft Java username</label>' +
+      '<input autocomplete="username" class="store-input" id="edit-username-input" maxlength="16" name="minecraftUsername" required type="text"/>' +
+      '<label class="confirm-check" for="edit-username-confirmed">' +
+      '<input id="edit-username-confirmed" type="checkbox"/>' +
+      "<span>" +
+      'I confirm <strong id="edit-username-preview">this username</strong> is my current in-game name.' +
+      "</span>" +
+      "</label>" +
+      '<p aria-live="polite" class="account-status" id="edit-username-status"></p>' +
+      '<div class="store-modal-actions store-modal-actions-single">' +
+      '<button class="button button-primary" disabled id="edit-username-submit" type="submit">Save username</button>' +
+      "</div>" +
+      "</form>" +
+      "</div>" +
+      "</div>"
+  );
+
+  editModalEl = byId("edit-username-modal");
+  bindEditModal();
+  return editModalEl;
+}
+
+function openEditModal(currentUsername) {
+  const modal = ensureEditModal();
+
+  if (!modal || editModalBusy) {
+    return;
+  }
+
+  const input = byId("edit-username-input");
+  const confirmed = byId("edit-username-confirmed");
+
+  window.clearTimeout(editModalCloseTimer);
+  setEditModalStatus("");
+
+  if (input) {
+    input.value = currentUsername || "";
+  }
+
+  if (confirmed) {
+    confirmed.checked = false;
+  }
+
+  updateEditSubmitState();
+
+  modal.hidden = false;
+  modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+
+  window.requestAnimationFrame(function () {
+    modal.classList.add("is-open");
+  });
+
+  window.setTimeout(function () {
+    if (input) {
+      input.focus();
+      input.select();
+    }
+  }, 90);
+}
+
+function closeEditModal(force) {
+  const modal = editModalEl || byId("edit-username-modal");
+
+  if (!modal || editModalBusy && !force) {
+    return;
+  }
+
+  modal.classList.remove("is-open");
+  modal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+
+  editModalCloseTimer = window.setTimeout(function () {
+    modal.hidden = true;
+    setEditModalStatus("");
+  }, EDIT_MODAL_CLOSE_DELAY_MS);
+}
+
+function bindEditModal() {
+  if (editModalBound) {
+    return;
+  }
+
+  editModalBound = true;
+
+  const modal = ensureEditModal();
+  const form = byId("edit-username-form");
+  const input = byId("edit-username-input");
+  const confirmed = byId("edit-username-confirmed");
 
   if (input) {
     input.addEventListener("input", function () {
       if (confirmed) {
         confirmed.checked = false;
       }
-      updateProfileSubmitState();
+      updateEditSubmitState();
     });
   }
 
   if (confirmed) {
-    confirmed.addEventListener("change", updateProfileSubmitState);
+    confirmed.addEventListener("change", updateEditSubmitState);
   }
 
-  if (form) {
-    form.addEventListener("submit", async function (event) {
-      event.preventDefault();
-      setStatus("profile-status", "");
-      setBusy(form, true);
-
-      try {
-        await window.CapitalAuth.upsertProfile(
-          byId("profile-minecraft-username").value.trim(),
-          Boolean(byId("profile-username-confirmed").checked)
-        );
-        setStatus("profile-status", "Username saved.", "success");
-        await refreshAccountView();
-      } catch (error) {
-        setStatus("profile-status", error.message || "Could not save username.", "error");
-      } finally {
-        setBusy(form, false);
-        updateProfileSubmitState();
+  if (modal) {
+    modal.addEventListener("click", function (event) {
+      if (event.target && event.target.hasAttribute("data-modal-dismiss")) {
+        closeEditModal(false);
       }
     });
   }
 
-  updateProfileSubmitState();
+  document.addEventListener("keydown", function (event) {
+    const visibleModal = editModalEl || byId("edit-username-modal");
+
+    if (event.key === "Escape" && visibleModal && !visibleModal.hidden) {
+      closeEditModal(false);
+    }
+  });
+
+  if (form) {
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      setEditModalStatus("");
+      editModalBusy = true;
+      setBusy(form, true);
+      updateEditSubmitState();
+
+      try {
+        await window.CapitalAuth.upsertProfile(
+          byId("edit-username-input").value.trim(),
+          Boolean(byId("edit-username-confirmed").checked)
+        );
+        closeEditModal(true);
+        await refreshAccountView();
+      } catch (error) {
+        setEditModalStatus(error.message || "Could not save username.", "error");
+      } finally {
+        editModalBusy = false;
+        setBusy(form, false);
+        updateEditSubmitState();
+      }
+    });
+  }
+
+  updateEditSubmitState();
+}
+
+function bindUsernameEdit() {
+  const editUsernameButton = byId("edit-username-button");
+
+  if (editUsernameButton) {
+    editUsernameButton.addEventListener("click", function () {
+      openEditModal(byId("account-linked-username")?.textContent?.trim() || "");
+    });
+  }
 }
 
 async function boot() {
@@ -411,7 +521,7 @@ async function boot() {
 
   await window.CapitalAuth.ready();
 
-  bindProfileForm();
+  bindUsernameEdit();
 
   const cancelSubscriptionButton = byId("cancel-subscription-button");
 

@@ -1242,9 +1242,49 @@ body.modal-open {
   text-transform: uppercase;
 }
 
+.account-meta-value-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 0;
+}
+
 .account-meta-value {
   font-weight: 700;
   text-align: right;
+}
+
+.account-meta-edit {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.account-meta-edit:hover,
+.account-meta-edit:focus-visible {
+  color: var(--text);
+  border-color: rgba(255, 138, 24, 0.45);
+  background: rgba(255, 138, 24, 0.08);
+  outline: none;
+}
+
+.username-edit-modal .store-modal-card {
+  width: min(100%, 420px);
+}
+
+.username-edit-modal .store-modal-header {
+  margin-bottom: 18px;
 }
 
 .account-status {

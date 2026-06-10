@@ -72,8 +72,8 @@ function ensureModal() {
       '<h2 class="store-modal-title" id="username-setup-title">You\'re logged in</h2>' +
       '<p class="store-modal-subtitle">' +
       "Please enter your exact current <strong>Minecraft Java username</strong>. " +
-      "You only need to do this once. You can change it later from " +
-      "<strong>Account → Manage account</strong>." +
+      "You only need to do this once. You can change it later from your " +
+      "<strong>Account</strong> page." +
       "</p>" +
       "</div>" +
       '<form class="account-form" id="username-setup-form" novalidate>' +

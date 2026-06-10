@@ -84,7 +84,14 @@ Continue with Discord
 <div class="account-meta">
 <div class="account-meta-row">
 <span class="account-meta-label">Minecraft username</span>
+<span class="account-meta-value-wrap">
 <span class="account-meta-value" id="account-linked-username">—</span>
+<button aria-label="Change Minecraft username" class="account-meta-edit" hidden id="edit-username-button" title="Change username" type="button">
+<svg aria-hidden="true" fill="none" height="16" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M11.333 2a1.414 1.414 0 0 1 2 2L5.333 12l-3 1 1-3 8-8z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+</svg>
+</button>
+</span>
 </div>
 <div class="account-meta-row">
 <span class="account-meta-label">Connected</span>
@@ -115,22 +122,6 @@ Continue with Discord
 </ul>
 </details>
 </section>
-<div id="profile-manage-section">
-<button class="button button-ghost" id="change-username-button" type="button">Change username</button>
-<form class="account-form" hidden id="profile-form" novalidate>
-<h3 class="account-subtitle">Minecraft username</h3>
-<label class="store-label" for="profile-minecraft-username">Minecraft Java username</label>
-<input autocomplete="username" class="store-input" id="profile-minecraft-username" maxlength="16" name="minecraftUsername" required type="text"/>
-<label class="confirm-check" for="profile-username-confirmed">
-<input id="profile-username-confirmed" type="checkbox"/>
-<span>
-I confirm <strong id="profile-username-preview">this username</strong> is my current in-game name.
-</span>
-</label>
-<button class="button button-primary" disabled id="profile-submit" type="submit">Save username</button>
-<p aria-live="polite" class="account-status" id="profile-status"></p>
-</form>
-</div>
 </article>
 </div>
 </section>
