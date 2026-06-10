@@ -99,7 +99,7 @@ async function getSessionUser() {
 async function getProfile() {
   const user = await getSessionUser();
 
-  if (!user) {
+  if (!user || !supabase) {
     return null;
   }
 
@@ -206,20 +206,80 @@ function onAuthStateChange(callback) {
   return supabase.auth.onAuthStateChange(callback);
 }
 
+function markReady() {
+  if (readyResolve) {
+    readyResolve();
+    readyResolve = null;
+  }
+}
+
+function buildCapitalAuth(configured) {
+  const api = {
+    configured: configured,
+    USERNAME_PATTERN: USERNAME_PATTERN,
+    ready: function () {
+      return readyPromise;
+    },
+    lookupMinecraftUsername: lookupMinecraftUsername,
+    onAuthStateChange: onAuthStateChange,
+    accountRedirectUrl: accountRedirectUrl,
+    signInWithGoogle: function () {
+      return signInWithOAuth("google");
+    },
+    signInWithDiscord: function () {
+      return signInWithOAuth("discord");
+    },
+    signOut: signOut,
+    getSession: getSession,
+    getSessionUser: getSessionUser,
+    getProfile: getProfile,
+    upsertProfile: upsertProfile,
+    hasCompleteProfile: hasCompleteProfile,
+    getMinecraftUsername: getMinecraftUsername,
+    isLoggedIn: isLoggedIn
+  };
+
+  if (!configured) {
+    api.signInWithGoogle = function () {
+      throw new Error("Supabase is not configured.");
+    };
+    api.signInWithDiscord = function () {
+      throw new Error("Supabase is not configured.");
+    };
+    api.signOut = async function () {};
+    api.getSession = async function () {
+      return null;
+    };
+    api.getSessionUser = async function () {
+      return null;
+    };
+    api.getProfile = async function () {
+      return null;
+    };
+    api.upsertProfile = async function () {
+      throw new Error("Supabase is not configured.");
+    };
+    api.hasCompleteProfile = async function () {
+      return false;
+    };
+    api.getMinecraftUsername = async function () {
+      return "";
+    };
+    api.isLoggedIn = async function () {
+      return false;
+    };
+  }
+
+  return api;
+}
+
+// Available immediately so nav/account scripts can call .ready() before async boot finishes.
+window.CapitalAuth = buildCapitalAuth(false);
+
 async function boot() {
   if (!isConfigured) {
-    window.CapitalAuth = {
-      configured: false,
-      USERNAME_PATTERN: USERNAME_PATTERN,
-      ready: function () {
-        return readyPromise;
-      },
-      lookupMinecraftUsername: lookupMinecraftUsername,
-      onAuthStateChange: function () {
-        return { data: { subscription: { unsubscribe: function () {} } } };
-      }
-    };
-    readyResolve();
+    window.CapitalAuth = buildCapitalAuth(false);
+    markReady();
     return;
   }
 
@@ -234,46 +294,12 @@ async function boot() {
 
   await supabase.auth.getSession();
 
-  window.CapitalAuth = {
-    configured: true,
-    USERNAME_PATTERN: USERNAME_PATTERN,
-    ready: function () {
-      return readyPromise;
-    },
-    signInWithGoogle: function () {
-      return signInWithOAuth("google");
-    },
-    signInWithDiscord: function () {
-      return signInWithOAuth("discord");
-    },
-    signOut: signOut,
-    getSession: getSession,
-    getSessionUser: getSessionUser,
-    getProfile: getProfile,
-    upsertProfile: upsertProfile,
-    lookupMinecraftUsername: lookupMinecraftUsername,
-    hasCompleteProfile: hasCompleteProfile,
-    getMinecraftUsername: getMinecraftUsername,
-    isLoggedIn: isLoggedIn,
-    onAuthStateChange: onAuthStateChange,
-    accountRedirectUrl: accountRedirectUrl
-  };
-
-  readyResolve();
+  window.CapitalAuth = buildCapitalAuth(true);
+  markReady();
 }
 
 boot().catch(function (error) {
   console.error(error);
-  window.CapitalAuth = {
-    configured: false,
-    USERNAME_PATTERN: USERNAME_PATTERN,
-    ready: function () {
-      return readyPromise;
-    },
-    lookupMinecraftUsername: lookupMinecraftUsername,
-    onAuthStateChange: function () {
-      return { data: { subscription: { unsubscribe: function () {} } } };
-    }
-  };
-  readyResolve();
+  window.CapitalAuth = buildCapitalAuth(false);
+  markReady();
 });

@@ -146,6 +146,15 @@ async function refreshAccountView() {
 
   showCheckoutNotice();
 
+  if (!window.CapitalAuth || typeof window.CapitalAuth.ready !== "function") {
+    if (warning) {
+      warning.hidden = false;
+      warning.textContent = "Account services failed to load. Refresh the page.";
+    }
+    await renderSignedOut();
+    return;
+  }
+
   await window.CapitalAuth.ready();
 
   if (!window.CapitalAuth.configured) {
@@ -247,6 +256,15 @@ function bindUsernameLookup(inputId, lookupId, previewId, submitId, confirmedId)
 }
 
 async function boot() {
+  if (!window.CapitalAuth || typeof window.CapitalAuth.ready !== "function") {
+    const warning = byId("account-service-warning");
+    if (warning) {
+      warning.hidden = false;
+      warning.textContent = "Account services failed to load. Refresh the page.";
+    }
+    return;
+  }
+
   await window.CapitalAuth.ready();
 
   bindUsernameLookup(

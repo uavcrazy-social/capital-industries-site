@@ -126,6 +126,11 @@ async function renderAccountSlot() {
 
   slot.innerHTML = "";
 
+  if (!window.CapitalAuth || typeof window.CapitalAuth.ready !== "function") {
+    slot.append(buildLoginButton());
+    return;
+  }
+
   await window.CapitalAuth.ready();
 
   if (!window.CapitalAuth.configured) {
