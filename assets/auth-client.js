@@ -1,19 +1,5 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.8";
-
 const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,16}$/;
-const url = String(window.CAPITAL_SUPABASE_URL || "").trim();
-const anonKey = String(window.CAPITAL_SUPABASE_ANON_KEY || "").trim();
-const isConfigured =
-  url &&
-  anonKey &&
-  url.indexOf("REPLACE_WITH_") === -1 &&
-  anonKey.indexOf("REPLACE_WITH_") === -1;
-
 let supabase = null;
-let readyResolve;
-const readyPromise = new Promise(function (resolve) {
-  readyResolve = resolve;
-});
 
 function accountRedirectUrl() {
   const params = new URLSearchParams(window.location.search);
@@ -206,100 +192,103 @@ function onAuthStateChange(callback) {
   return supabase.auth.onAuthStateChange(callback);
 }
 
-function markReady() {
-  if (readyResolve) {
-    readyResolve();
-    readyResolve = null;
-  }
-}
+function assignLiveApi() {
+  const auth = window.CapitalAuth;
 
-function buildCapitalAuth(configured) {
-  const api = {
-    configured: configured,
-    USERNAME_PATTERN: USERNAME_PATTERN,
-    ready: function () {
-      return readyPromise;
-    },
-    lookupMinecraftUsername: lookupMinecraftUsername,
-    onAuthStateChange: onAuthStateChange,
-    accountRedirectUrl: accountRedirectUrl,
-    signInWithGoogle: function () {
-      return signInWithOAuth("google");
-    },
-    signInWithDiscord: function () {
-      return signInWithOAuth("discord");
-    },
-    signOut: signOut,
-    getSession: getSession,
-    getSessionUser: getSessionUser,
-    getProfile: getProfile,
-    upsertProfile: upsertProfile,
-    hasCompleteProfile: hasCompleteProfile,
-    getMinecraftUsername: getMinecraftUsername,
-    isLoggedIn: isLoggedIn
+  auth.configured = true;
+  auth.USERNAME_PATTERN = USERNAME_PATTERN;
+  auth.accountRedirectUrl = accountRedirectUrl;
+  auth.lookupMinecraftUsername = lookupMinecraftUsername;
+  auth.onAuthStateChange = onAuthStateChange;
+  auth.signInWithGoogle = function () {
+    return signInWithOAuth("google");
   };
-
-  if (!configured) {
-    api.signInWithGoogle = function () {
-      throw new Error("Supabase is not configured.");
-    };
-    api.signInWithDiscord = function () {
-      throw new Error("Supabase is not configured.");
-    };
-    api.signOut = async function () {};
-    api.getSession = async function () {
-      return null;
-    };
-    api.getSessionUser = async function () {
-      return null;
-    };
-    api.getProfile = async function () {
-      return null;
-    };
-    api.upsertProfile = async function () {
-      throw new Error("Supabase is not configured.");
-    };
-    api.hasCompleteProfile = async function () {
-      return false;
-    };
-    api.getMinecraftUsername = async function () {
-      return "";
-    };
-    api.isLoggedIn = async function () {
-      return false;
-    };
-  }
-
-  return api;
+  auth.signInWithDiscord = function () {
+    return signInWithOAuth("discord");
+  };
+  auth.signOut = signOut;
+  auth.getSession = getSession;
+  auth.getSessionUser = getSessionUser;
+  auth.getProfile = getProfile;
+  auth.upsertProfile = upsertProfile;
+  auth.hasCompleteProfile = hasCompleteProfile;
+  auth.getMinecraftUsername = getMinecraftUsername;
+  auth.isLoggedIn = isLoggedIn;
 }
 
-// Available immediately so nav/account scripts can call .ready() before async boot finishes.
-window.CapitalAuth = buildCapitalAuth(false);
+function assignOfflineApi(message) {
+  const auth = window.CapitalAuth;
+  const errorMessage = message || "Supabase is not configured.";
+
+  auth.configured = false;
+  auth.USERNAME_PATTERN = USERNAME_PATTERN;
+  auth.lookupMinecraftUsername = lookupMinecraftUsername;
+  auth.accountRedirectUrl = accountRedirectUrl;
+  auth.isLoggedIn = async function () {
+    return false;
+  };
+  auth.getSessionUser = async function () {
+    return null;
+  };
+  auth.getProfile = async function () {
+    return null;
+  };
+  auth.hasCompleteProfile = async function () {
+    return false;
+  };
+  auth.getMinecraftUsername = async function () {
+    return "";
+  };
+  auth.signInWithGoogle = function () {
+    return Promise.reject(new Error(errorMessage));
+  };
+  auth.signInWithDiscord = function () {
+    return Promise.reject(new Error(errorMessage));
+  };
+  auth.signOut = async function () {};
+  auth.upsertProfile = function () {
+    return Promise.reject(new Error(errorMessage));
+  };
+  auth.onAuthStateChange = function () {
+    return { data: { subscription: { unsubscribe: function () {} } } };
+  };
+}
 
 async function boot() {
+  const url = String(window.CAPITAL_SUPABASE_URL || "").trim();
+  const anonKey = String(window.CAPITAL_SUPABASE_ANON_KEY || "").trim();
+  const isConfigured =
+    url &&
+    anonKey &&
+    url.indexOf("REPLACE_WITH_") === -1 &&
+    anonKey.indexOf("REPLACE_WITH_") === -1;
+
   if (!isConfigured) {
-    window.CapitalAuth = buildCapitalAuth(false);
-    markReady();
+    assignOfflineApi("Supabase is not configured.");
+    window.CapitalAuth.markReady();
     return;
   }
 
-  supabase = createClient(url, anonKey, {
-    auth: {
-      flowType: "pkce",
-      detectSessionInUrl: true,
-      persistSession: true,
-      autoRefreshToken: true
-    }
-  });
+  try {
+    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.49.8");
 
-  await supabase.auth.getSession();
+    supabase = createClient(url, anonKey, {
+      auth: {
+        flowType: "pkce",
+        detectSessionInUrl: true,
+        persistSession: true,
+        autoRefreshToken: true
+      }
+    });
 
-  window.CapitalAuth = buildCapitalAuth(true);
-  markReady();
+    await supabase.auth.getSession();
+    assignLiveApi();
+  } catch (error) {
+    console.error(error);
+    assignOfflineApi("Account services failed to load.");
+  }
+
+  window.CapitalAuth.markReady();
 }
 
-boot().catch(function (error) {
-  console.error(error);
-  window.CapitalAuth = buildCapitalAuth(false);
-  markReady();
-});
+boot();
