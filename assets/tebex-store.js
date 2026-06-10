@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  var RANK_PURCHASES_ENABLED = false;
+  var RANK_PURCHASES_ENABLED = true;
 
   var TEBEX_PUBLIC_TOKEN = String(window.CAPITAL_TEBEX_PUBLIC_TOKEN || "13bmd-225b100e916451ed82c9e96183f8929d044f437c");
   var PACKAGE_IDS = {
