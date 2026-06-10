@@ -83,7 +83,50 @@ Continue with Discord
 <span class="account-meta-label">Linked in-game name</span>
 <span class="account-meta-value" id="account-linked-username">—</span>
 </div>
+<div class="account-meta-row">
+<span class="account-meta-label">Sign-in methods</span>
+<span class="account-meta-value" id="account-connected-providers">—</span>
 </div>
+</div>
+<section class="account-section" id="account-subscription-section">
+<h3 class="account-subtitle">Active subscription</h3>
+<div class="account-subscription-card" id="account-subscription-card">
+<p class="link-text" id="account-subscription-empty">No active rank subscription yet.</p>
+<div hidden id="account-subscription-details">
+<p class="account-subscription-rank" id="account-subscription-rank">—</p>
+<p class="link-text" id="account-subscription-meta">—</p>
+<p class="link-text account-policy-note">
+Only one rank subscription is allowed at a time. To change ranks, cancel your current plan in Tebex first, then purchase a new rank.
+</p>
+</div>
+</div>
+</section>
+<section class="account-section" id="account-history-section">
+<h3 class="account-subtitle">Order history</h3>
+<p class="link-text" id="account-history-empty">No purchases recorded yet.</p>
+<div class="account-table-wrap" hidden id="account-history-table-wrap">
+<table class="account-table">
+<thead>
+<tr>
+<th>Date</th>
+<th>Rank</th>
+<th>Status</th>
+<th>Amount</th>
+</tr>
+</thead>
+<tbody id="account-history-body"></tbody>
+</table>
+</div>
+</section>
+<section class="account-section account-policy-panel">
+<h3 class="account-subtitle">Account rules</h3>
+<ul class="account-policy-list">
+<li>Each Minecraft username can only be linked to one site account.</li>
+<li>Google and Discord create separate logins unless manually merged by support.</li>
+<li>Only one paid rank subscription is allowed per account and in-game name.</li>
+<li>Order history and subscriptions sync from Tebex after webhook setup.</li>
+</ul>
+</section>
 <div id="profile-manage-section">
 <form class="account-form" hidden id="profile-form" novalidate>
 <h3 class="account-subtitle">Update in-game username</h3>

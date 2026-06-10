@@ -57,6 +57,7 @@
   }
 
   var linkedUsername = "";
+  var activeSubscription = null;
 
   function waitForAuth() {
     return new Promise(function (resolve) {
@@ -81,23 +82,48 @@
     }
   }
 
+  function rememberButtonDefault(button) {
+    if (!button.getAttribute("data-default-html")) {
+      button.setAttribute("data-default-html", button.innerHTML);
+    }
+  }
+
+  function restoreButtonDefault(button) {
+    var html = button.getAttribute("data-default-html");
+    if (html) {
+      button.innerHTML = html;
+    }
+  }
+
   async function refreshStoreAccess() {
     await waitForAuth();
 
     if (!window.CapitalAuth || !window.CapitalAuth.configured) {
       setAuthNoticeVisible(true);
-      setButtonState(true);
+      activeSubscription = null;
       linkedUsername = "";
+      updateRankButtons(false, null);
       return;
     }
 
-    var loggedIn = await window.CapitalAuth.isLoggedIn();
-    var complete = loggedIn && await window.CapitalAuth.hasCompleteProfile();
+    try {
+      var loggedIn = await window.CapitalAuth.isLoggedIn();
+      var complete = loggedIn && await window.CapitalAuth.hasCompleteProfile();
 
-    linkedUsername = complete ? await window.CapitalAuth.getMinecraftUsername() : "";
-    setAuthNoticeVisible(!complete);
-    setButtonState(false);
-    updateConfirmState();
+      linkedUsername = complete ? await window.CapitalAuth.getMinecraftUsername() : "";
+      activeSubscription =
+        complete && typeof window.CapitalAuth.getActiveSubscription === "function"
+          ? await window.CapitalAuth.getActiveSubscription()
+          : null;
+
+      setAuthNoticeVisible(!complete);
+      updateRankButtons(complete, activeSubscription);
+      updateConfirmState();
+    } catch (error) {
+      console.error(error);
+      setStatus(error.message || "Could not load store account state.");
+      updateRankButtons(false, null);
+    }
   }
 
   function getUsername() {
@@ -138,12 +164,40 @@
     return packageId;
   }
 
-  function setButtonState(disabled) {
+  function setButtonsBusy(busy) {
     var buttons = document.querySelectorAll("[data-tebex-package]");
 
     buttons.forEach(function (button) {
-      button.disabled = disabled || !RANK_PURCHASES_ENABLED;
-      button.setAttribute("aria-busy", disabled ? "true" : "false");
+      button.setAttribute("aria-busy", busy ? "true" : "false");
+    });
+  }
+
+  function updateRankButtons(canCheckout, subscription) {
+    var buttons = document.querySelectorAll("[data-tebex-package]");
+
+    buttons.forEach(function (button) {
+      rememberButtonDefault(button);
+      restoreButtonDefault(button);
+
+      var packageKey = button.getAttribute("data-tebex-package");
+      var disabled = !RANK_PURCHASES_ENABLED || !canCheckout;
+      var label = "Buy rank";
+
+      if (subscription && subscription.rank_key) {
+        if (subscription.rank_key === packageKey) {
+          disabled = true;
+          label = "Current rank";
+        } else {
+          disabled = true;
+          label = "One rank at a time";
+        }
+      }
+
+      button.disabled = disabled;
+
+      if (disabled && subscription) {
+        button.textContent = label;
+      }
     });
   }
 
@@ -221,6 +275,7 @@
       packagePrice.textContent = display.price ? "(" + display.price + ")" : "";
     }
 
+    checkbox.disabled = false;
     checkbox.checked = false;
     setStatus("");
     setModalBusy(false);
@@ -275,7 +330,24 @@
     return unwrapTebexPayload(payload);
   }
 
-  async function createBasket(username) {
+  async function assertCanPurchaseRank(packageKey) {
+    if (
+      activeSubscription &&
+      activeSubscription.status === "active"
+    ) {
+      if (activeSubscription.rank_key === packageKey) {
+        throw new Error("You already have this rank active.");
+      }
+
+      throw new Error(
+        "You already have an active " +
+        (PACKAGE_DISPLAY[activeSubscription.rank_key] || { name: "rank" }).name +
+        " subscription. Only one rank at a time."
+      );
+    }
+  }
+
+  async function createBasket(username, userId) {
     return requestJson(
       getCheckoutUrl("/accounts/" + encodeURIComponent(TEBEX_PUBLIC_TOKEN) + "/baskets"),
       {
@@ -290,6 +362,7 @@
           complete_auto_redirect: true,
           custom: {
             source: "capital-industries-store",
+            supabase_user_id: userId || "",
             minecraft_username: username,
             username_confirmed_by_buyer: true,
             minecraft_uuid: ""
@@ -377,13 +450,20 @@
 
   async function beginCheckout(packageKey, username) {
     try {
-      setButtonState(true);
+      setButtonsBusy(true);
       setModalBusy(true);
       setStatus("Creating secure Tebex checkout...");
 
       assertConfigured();
+      await refreshStoreAccess();
+      await assertCanPurchaseRank(packageKey);
+
+      var user =
+        window.CapitalAuth && window.CapitalAuth.getSessionUser
+          ? await window.CapitalAuth.getSessionUser()
+          : null;
       var packageId = assertPackageConfigured(packageKey);
-      var basket = await createBasket(username);
+      var basket = await createBasket(username, user ? user.id : "");
 
       if (!basket || !basket.ident) {
         throw new Error("Tebex did not return a basket ident.");
@@ -400,7 +480,11 @@
 
       if (error.message && error.message.toLowerCase().indexOf("auth") !== -1) {
         try {
-          var retryBasket = await createBasket(username);
+          var retryUser =
+            window.CapitalAuth && window.CapitalAuth.getSessionUser
+              ? await window.CapitalAuth.getSessionUser()
+              : null;
+          var retryBasket = await createBasket(username, retryUser ? retryUser.id : "");
           var authUrl = await getBasketAuthUrl(retryBasket.ident);
 
           if (authUrl) {
@@ -415,6 +499,7 @@
       setStatus(error.message || "Unable to open Tebex checkout.");
     } finally {
       setModalBusy(false);
+      setButtonsBusy(false);
       refreshStoreAccess();
     }
   }
@@ -435,33 +520,41 @@
       return;
     }
 
-    await waitForAuth();
+    var trigger = event.currentTarget;
 
-    if (!window.CapitalAuth || !window.CapitalAuth.configured) {
-      setStatus("Account sign-in is not configured yet.");
+    if (trigger.disabled) {
       return;
     }
-
-    if (!await window.CapitalAuth.isLoggedIn()) {
-      redirectToAccount(false);
-      return;
-    }
-
-    if (!await window.CapitalAuth.hasCompleteProfile()) {
-      redirectToAccount(true);
-      return;
-    }
-
-    linkedUsername = await window.CapitalAuth.getMinecraftUsername();
-    var packageKey = event.currentTarget.getAttribute("data-tebex-package");
 
     try {
+      await waitForAuth();
+
+      if (!window.CapitalAuth || !window.CapitalAuth.configured) {
+        setStatus("Account sign-in is not configured yet.");
+        return;
+      }
+
+      if (!await window.CapitalAuth.isLoggedIn()) {
+        redirectToAccount(false);
+        return;
+      }
+
+      if (!await window.CapitalAuth.hasCompleteProfile()) {
+        redirectToAccount(true);
+        return;
+      }
+
+      await refreshStoreAccess();
+      linkedUsername = await window.CapitalAuth.getMinecraftUsername();
+      var packageKey = trigger.getAttribute("data-tebex-package");
+
       assertConfigured();
       assertPackageConfigured(packageKey);
-      openUsernameModal(packageKey, event.currentTarget);
+      await assertCanPurchaseRank(packageKey);
+      openUsernameModal(packageKey, trigger);
     } catch (error) {
       console.error(error);
-      setStatus(error.message || "Checkout is not configured.");
+      setStatus(error.message || "Unable to start checkout.");
     }
   }
 
@@ -495,8 +588,12 @@
     var continueButton = getContinueButton();
 
     buttons.forEach(function (button) {
+      rememberButtonDefault(button);
       button.addEventListener("click", function (event) {
-        handleBuyClick(event);
+        handleBuyClick(event).catch(function (error) {
+          console.error(error);
+          setStatus(error.message || "Unable to start checkout.");
+        });
       });
     });
 
@@ -524,8 +621,26 @@
       }
     });
 
-    refreshStoreAccess();
+    window.addEventListener("capital:username-setup-complete", function () {
+      refreshStoreAccess();
+    });
+
+    waitForAuth().then(function () {
+      if (typeof window.CapitalAuth.onAuthStateChange === "function") {
+        window.CapitalAuth.onAuthStateChange(function () {
+          refreshStoreAccess();
+        });
+      }
+
+      return refreshStoreAccess();
+    }).catch(function (error) {
+      console.error(error);
+    });
   }
 
-  initializeCheckoutButtons();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeCheckoutButtons);
+  } else {
+    initializeCheckoutButtons();
+  }
 }());

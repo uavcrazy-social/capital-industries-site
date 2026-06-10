@@ -1061,6 +1061,77 @@ body.modal-open {
   border-bottom: 1px solid var(--line);
 }
 
+.account-section {
+  margin: 0 0 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.account-section:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.account-subscription-card {
+  padding: 16px;
+  border: 1px solid rgba(255, 138, 24, 0.22);
+  border-radius: 16px;
+  background: rgba(255, 138, 24, 0.05);
+}
+
+.account-subscription-rank {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.account-policy-note,
+.account-policy-list {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.account-policy-list {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.account-policy-panel {
+  padding-bottom: 0;
+}
+
+.account-table-wrap {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.account-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.account-table th,
+.account-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.account-table th {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.account-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
 .account-meta-label {
   color: var(--muted);
   font-size: 0.88rem;

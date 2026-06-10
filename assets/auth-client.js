@@ -84,7 +84,33 @@ function friendlyProfileError(error) {
     return new Error("Could not save username. Account permissions may need to be configured.");
   }
 
+  if (error?.code === "23505" || /duplicate key|unique constraint/i.test(message)) {
+    return new Error("This Minecraft username is already linked to another account.");
+  }
+
   return error instanceof Error ? error : new Error(message || "Could not save username.");
+}
+
+async function isUsernameAvailable(username) {
+  const user = await getSessionUser();
+
+  if (!user || !supabase) {
+    return false;
+  }
+
+  const normalized = normalizeUsername(username);
+  const { data, error } = await supabase.rpc("is_minecraft_username_available", {
+    p_username: normalized
+  });
+
+  if (error) {
+    if (error.code === "42883") {
+      return true;
+    }
+    throw friendlyProfileError(error);
+  }
+
+  return Boolean(data);
 }
 
 async function upsertProfile(minecraftUsername, usernameConfirmed) {
@@ -98,6 +124,12 @@ async function upsertProfile(minecraftUsername, usernameConfirmed) {
 
   if (!usernameConfirmed) {
     throw new Error("Confirm that the Minecraft username is your current in-game name.");
+  }
+
+  const available = await isUsernameAvailable(username);
+
+  if (!available) {
+    throw new Error("This Minecraft username is already linked to another account.");
   }
 
   const { data, error } = await supabase
@@ -168,6 +200,89 @@ async function isLoggedIn() {
   return Boolean(await getSessionUser());
 }
 
+async function getActiveSubscription() {
+  const user = await getSessionUser();
+
+  if (!user || !supabase) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("subscriptions")
+    .select(
+      "id, rank_key, status, package_name, price_amount, price_currency, started_at, current_period_end, canceled_at, minecraft_username, tebex_recurring_reference"
+    )
+    .eq("user_id", user.id)
+    .eq("status", "active")
+    .order("started_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    if (error.code === "42P01") {
+      return null;
+    }
+    throw error;
+  }
+
+  return data;
+}
+
+async function getPurchaseHistory(limit) {
+  const user = await getSessionUser();
+  const maxRows = limit || 25;
+
+  if (!user || !supabase) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("purchases")
+    .select(
+      "id, rank_key, status, event_type, amount, currency, purchased_at, minecraft_username, tebex_transaction_id"
+    )
+    .eq("user_id", user.id)
+    .order("purchased_at", { ascending: false })
+    .limit(maxRows);
+
+  if (error) {
+    if (error.code === "42P01") {
+      return [];
+    }
+    throw error;
+  }
+
+  return data || [];
+}
+
+function getConnectedProviders(user) {
+  if (!user) {
+    return [];
+  }
+
+  const providers = new Set();
+
+  if (Array.isArray(user.identities)) {
+    user.identities.forEach(function (identity) {
+      if (identity && identity.provider) {
+        providers.add(identity.provider);
+      }
+    });
+  }
+
+  if (user.app_metadata && user.app_metadata.provider) {
+    providers.add(user.app_metadata.provider);
+  }
+
+  if (Array.isArray(user.app_metadata && user.app_metadata.providers)) {
+    user.app_metadata.providers.forEach(function (provider) {
+      providers.add(provider);
+    });
+  }
+
+  return Array.from(providers);
+}
+
 async function notifyUsernameSetupIfNeeded() {
   if (!supabase) {
     return;
@@ -220,6 +335,10 @@ function assignLiveApi() {
   auth.hasCompleteProfile = hasCompleteProfile;
   auth.getMinecraftUsername = getMinecraftUsername;
   auth.isLoggedIn = isLoggedIn;
+  auth.isUsernameAvailable = isUsernameAvailable;
+  auth.getActiveSubscription = getActiveSubscription;
+  auth.getPurchaseHistory = getPurchaseHistory;
+  auth.getConnectedProviders = getConnectedProviders;
 }
 
 function assignOfflineApi(message) {
@@ -257,6 +376,18 @@ function assignOfflineApi(message) {
   };
   auth.onAuthStateChange = function () {
     return { data: { subscription: { unsubscribe: function () {} } } };
+  };
+  auth.isUsernameAvailable = async function () {
+    return false;
+  };
+  auth.getActiveSubscription = async function () {
+    return null;
+  };
+  auth.getPurchaseHistory = async function () {
+    return [];
+  };
+  auth.getConnectedProviders = function () {
+    return [];
   };
 }
 

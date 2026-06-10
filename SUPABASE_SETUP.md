@@ -21,11 +21,15 @@ window.CAPITAL_SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
 window.CAPITAL_SUPABASE_ANON_KEY = "YOUR_ANON_KEY";
 ```
 
-## 2. Run the profiles migration
+## 2. Run the database migrations
 
-In **SQL Editor**, run `supabase/migrations/001_profiles.sql`.
+In **SQL Editor**, run these in order:
 
-This creates `public.profiles` with row-level security so users can only read and update their own row.
+1. `supabase/migrations/001_profiles.sql`
+2. `supabase/migrations/002_username_unique.sql` — one Minecraft username per account
+3. `supabase/migrations/003_store_records.sql` — purchase/subscription history for the account page
+
+`profiles` uses row-level security so users can only read and update their own row.
 
 ## 3. Configure Auth redirect URLs
 
@@ -70,7 +74,7 @@ Push to GitHub Pages as usual. Auth callbacks return to `/account/` where Supaba
 
 1. User clicks **Continue with Google** or **Continue with Discord** on `/account/` (only public login methods)
 2. Supabase OAuth completes and redirects back to `/account/`
-3. User enters Minecraft username (Mojang lookup + confirmation checkbox)
+3. User enters Minecraft username in the one-time setup popup (confirmation checkbox)
 4. Profile row is saved in `public.profiles`
 5. Store checkout requires sign-in and a linked username
 
@@ -82,7 +86,8 @@ Push to GitHub Pages as usual. Auth callbacks return to `/account/` where Supaba
 
 - Only the **anon** key belongs in static frontend code.
 - RLS on `profiles` is required.
-- Mojang username validation runs in the browser before save; mistakes still rely on user confirmation and Discord support.
+- Each Minecraft username can only be linked to one site account (unique index + availability check).
+- Google and Discord are separate logins unless support manually merges them in Supabase.
 
 ## Not available
 
@@ -92,6 +97,16 @@ Push to GitHub Pages as usual. Auth callbacks return to `/account/` where Supaba
 - Email verification
 - Site-managed email notifications
 
-## Deferred
+## Tebex webhook sync
 
-- Tebex webhook sync into Supabase (can be added later with a Supabase Edge Function)
+Deploy `supabase/functions/tebex-webhook` and point your Tebex webhook endpoint to:
+
+```
+https://YOUR_PROJECT.supabase.co/functions/v1/tebex-webhook
+```
+
+Set Supabase secrets:
+
+- `TEBEX_WEBHOOK_SECRET` — from Tebex Creator → Webhooks
+
+The function writes `purchases` and `subscriptions` rows used by the account page and one-rank checkout guard.

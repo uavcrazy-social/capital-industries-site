@@ -50,6 +50,12 @@ function setBusy(form, busy) {
   });
 }
 
+const RANK_LABELS = {
+  member: "Member",
+  premium: "Premium",
+  elite: "Elite"
+};
+
 function providerLabel(user) {
   const provider = user?.app_metadata?.provider || "oauth";
 
@@ -62,6 +68,163 @@ function providerLabel(user) {
   }
 
   return "OAuth";
+}
+
+function formatProviderName(provider) {
+  if (provider === "google") {
+    return "Google";
+  }
+
+  if (provider === "discord") {
+    return "Discord";
+  }
+
+  return provider;
+}
+
+function formatDate(value) {
+  if (!value) {
+    return "—";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "—";
+  }
+
+  return date.toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  });
+}
+
+function formatMoney(amount, currency) {
+  if (amount === null || amount === undefined || amount === "") {
+    return "—";
+  }
+
+  const code = currency || "USD";
+
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: code
+    }).format(Number(amount));
+  } catch (error) {
+    return String(amount) + " " + code;
+  }
+}
+
+function rankLabel(rankKey) {
+  return RANK_LABELS[rankKey] || rankKey || "—";
+}
+
+async function renderAccountDetails(user) {
+  const providers =
+    window.CapitalAuth && typeof window.CapitalAuth.getConnectedProviders === "function"
+      ? window.CapitalAuth.getConnectedProviders(user)
+      : [];
+
+  setText(
+    "account-connected-providers",
+    providers.length
+      ? providers.map(formatProviderName).join(" + ")
+      : providerLabel(user)
+  );
+
+  let subscription = null;
+  let purchases = [];
+
+  try {
+    if (typeof window.CapitalAuth.getActiveSubscription === "function") {
+      subscription = await window.CapitalAuth.getActiveSubscription();
+    }
+
+    if (typeof window.CapitalAuth.getPurchaseHistory === "function") {
+      purchases = await window.CapitalAuth.getPurchaseHistory(25);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
+  const subscriptionEmpty = byId("account-subscription-empty");
+  const subscriptionDetails = byId("account-subscription-details");
+
+  if (subscription) {
+    if (subscriptionEmpty) {
+      subscriptionEmpty.hidden = true;
+    }
+
+    if (subscriptionDetails) {
+      subscriptionDetails.hidden = false;
+    }
+
+    setText(
+      "account-subscription-rank",
+      subscription.package_name || rankLabel(subscription.rank_key)
+    );
+
+    const metaParts = [
+      "Status: " + (subscription.status || "active"),
+      "In-game: " + (subscription.minecraft_username || "—"),
+      "Started: " + formatDate(subscription.started_at)
+    ];
+
+    if (subscription.current_period_end) {
+      metaParts.push("Renews/ends: " + formatDate(subscription.current_period_end));
+    }
+
+    setText("account-subscription-meta", metaParts.join(" · "));
+  } else {
+    if (subscriptionEmpty) {
+      subscriptionEmpty.hidden = false;
+    }
+
+    if (subscriptionDetails) {
+      subscriptionDetails.hidden = true;
+    }
+  }
+
+  const historyEmpty = byId("account-history-empty");
+  const historyWrap = byId("account-history-table-wrap");
+  const historyBody = byId("account-history-body");
+
+  if (!historyBody) {
+    return;
+  }
+
+  historyBody.innerHTML = "";
+
+  if (!purchases.length) {
+    if (historyEmpty) {
+      historyEmpty.hidden = false;
+    }
+
+    if (historyWrap) {
+      historyWrap.hidden = true;
+    }
+    return;
+  }
+
+  if (historyEmpty) {
+    historyEmpty.hidden = true;
+  }
+
+  if (historyWrap) {
+    historyWrap.hidden = false;
+  }
+
+  purchases.forEach(function (purchase) {
+    const row = document.createElement("tr");
+    row.innerHTML =
+      "<td>" + formatDate(purchase.purchased_at) + "</td>" +
+      "<td>" + rankLabel(purchase.rank_key) + "</td>" +
+      "<td>" + (purchase.status || purchase.event_type || "—") + "</td>" +
+      "<td>" + formatMoney(purchase.amount, purchase.currency) + "</td>";
+    historyBody.appendChild(row);
+  });
 }
 
 async function promptUsernameSetupIfNeeded() {
@@ -99,6 +262,8 @@ async function renderSignedIn(user, profile, options) {
   if (profileSection) {
     profileSection.hidden = needsSetup;
   }
+
+  await renderAccountDetails(user);
 
   if (!needsSetup && profile) {
     const usernameInput = byId("profile-minecraft-username");

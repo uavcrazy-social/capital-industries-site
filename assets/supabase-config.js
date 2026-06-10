@@ -65,6 +65,18 @@
     },
     onAuthStateChange: function () {
       return { data: { subscription: { unsubscribe: function () {} } } };
+    },
+    isUsernameAvailable: function () {
+      return Promise.resolve(false);
+    },
+    getActiveSubscription: function () {
+      return Promise.resolve(null);
+    },
+    getPurchaseHistory: function () {
+      return Promise.resolve([]);
+    },
+    getConnectedProviders: function () {
+      return [];
     }
   };
 }());

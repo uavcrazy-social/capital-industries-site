@@ -7,7 +7,8 @@ This site uses direct Headless Tebex checkout from `/store/`.
 - `Player` is display-only and is not connected to checkout.
 - `Member`, `Premium`, and `Elite` are checkout buttons when `RANK_PURCHASES_ENABLED` is true.
 - Buyers must continue on `/account/` with Google or Discord.
-- Buyers must link a Minecraft username (Mojang lookup + confirmation) before checkout.
+- Buyers must link a Minecraft username (one-time setup popup + confirmation) before checkout.
+- Only one active rank subscription is allowed per account / in-game name.
 - Checkout uses the linked username from Supabase `profiles`, not a free-text field.
 - Tebex checkout handles payment UI and payment processing.
 
@@ -29,7 +30,16 @@ Do not put a Tebex private key, webhook secret, or admin API secret in this brow
 
 ## Account management
 
-Public login is Google or Discord only. See `SUPABASE_SETUP.md` for provider configuration and the `profiles` table migration.
+Public login is Google or Discord only. See `SUPABASE_SETUP.md` for provider configuration and migrations.
+
+`/account/` shows:
+
+- Linked in-game username and connected providers
+- Active subscription (from Tebex webhook sync)
+- Order history
+- One-rank policy (checkout blocked while a subscription is active)
+
+Deploy the `tebex-webhook` Supabase Edge Function so purchases appear after payment.
 
 ## Tebex package setup
 
