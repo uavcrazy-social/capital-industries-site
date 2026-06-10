@@ -102,23 +102,6 @@ function formatDate(value) {
   });
 }
 
-function formatMoney(amount, currency) {
-  if (amount === null || amount === undefined || amount === "") {
-    return "—";
-  }
-
-  const code = currency || "USD";
-
-  try {
-    return new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency: code
-    }).format(Number(amount));
-  } catch (error) {
-    return String(amount) + " " + code;
-  }
-}
-
 function rankLabel(rankKey) {
   return RANK_LABELS[rankKey] || rankKey || "—";
 }
@@ -137,17 +120,11 @@ async function renderAccountDetails(user) {
   );
 
   let subscription = null;
-  let purchases = [];
 
   try {
     if (typeof window.CapitalAuth.getActiveSubscription === "function") {
       subscription = await window.CapitalAuth.getActiveSubscription();
     }
-
-    if (typeof window.CapitalAuth.getPurchaseHistory === "function") {
-      purchases = await window.CapitalAuth.getPurchaseHistory(25);
-    }
-
   } catch (error) {
     console.error(error);
   }
@@ -198,45 +175,6 @@ async function renderAccountDetails(user) {
       subscriptionDetails.hidden = true;
     }
   }
-
-  const historyEmpty = byId("account-history-empty");
-  const historyWrap = byId("account-history-table-wrap");
-  const historyBody = byId("account-history-body");
-
-  if (!historyBody) {
-    return;
-  }
-
-  historyBody.innerHTML = "";
-
-  if (!purchases.length) {
-    if (historyEmpty) {
-      historyEmpty.hidden = false;
-    }
-
-    if (historyWrap) {
-      historyWrap.hidden = true;
-    }
-    return;
-  }
-
-  if (historyEmpty) {
-    historyEmpty.hidden = true;
-  }
-
-  if (historyWrap) {
-    historyWrap.hidden = false;
-  }
-
-  purchases.forEach(function (purchase) {
-    const row = document.createElement("tr");
-    row.innerHTML =
-      "<td>" + formatDate(purchase.purchased_at) + "</td>" +
-      "<td>" + rankLabel(purchase.rank_key) + "</td>" +
-      "<td>" + (purchase.status || purchase.event_type || "—") + "</td>" +
-      "<td>" + formatMoney(purchase.amount, purchase.currency) + "</td>";
-    historyBody.appendChild(row);
-  });
 }
 
 async function promptUsernameSetupIfNeeded() {

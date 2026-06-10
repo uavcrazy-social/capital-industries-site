@@ -1159,37 +1159,6 @@ body.modal-open {
   padding-bottom: 0;
 }
 
-.account-table-wrap {
-  overflow: auto;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-}
-
-.account-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.92rem;
-}
-
-.account-table th,
-.account-table td {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-}
-
-.account-table th {
-  color: var(--muted);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.account-table tbody tr:last-child td {
-  border-bottom: 0;
-}
-
 .account-meta-label {
   color: var(--muted);
   font-size: 0.88rem;

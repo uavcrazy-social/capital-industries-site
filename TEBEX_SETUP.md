@@ -36,10 +36,10 @@ Public login is Google or Discord only. See `SUPABASE_SETUP.md` for provider con
 
 - Linked in-game username and connected providers
 - Active subscription (from Tebex webhook sync)
-- Order history
+- Manage / cancel subscription (Tebex payment portal — includes payment history)
 - One-rank policy (checkout blocked while a subscription is active)
 
-Deploy the `tebex-webhook` Supabase Edge Function so purchases appear after payment.
+Deploy the `tebex-webhook` Supabase Edge Function so `subscriptions` and `purchases` stay synced in Supabase for admin/backend use. Customers see payment history in the Tebex portal, not on the account page.
 
 ## Tebex package setup
 

@@ -109,4 +109,4 @@ Set Supabase secrets:
 
 - `TEBEX_WEBHOOK_SECRET` — from Tebex Creator → Webhooks
 
-The function writes `purchases` and `subscriptions` rows used by the account page and one-rank checkout guard.
+The function writes `purchases` (admin ledger) and `subscriptions` (active rank + one-rank checkout guard on the store/account page).
