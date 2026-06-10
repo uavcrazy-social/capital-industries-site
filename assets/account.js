@@ -187,6 +187,11 @@ async function renderSignedOut() {
   setPanelHidden("account-session-panel", true);
   setPanelHidden("auth-panel", false);
 
+  const editUsernameButton = byId("edit-username-button");
+  if (editUsernameButton) {
+    editUsernameButton.hidden = true;
+  }
+
   if (window.CapitalProfileSetup && typeof window.CapitalProfileSetup.close === "function") {
     window.CapitalProfileSetup.close(true);
   }
@@ -207,7 +212,7 @@ async function renderSignedIn(user, profile, options) {
   const editUsernameButton = byId("edit-username-button");
 
   if (editUsernameButton) {
-    editUsernameButton.hidden = needsSetup;
+    editUsernameButton.hidden = false;
   }
 
   await renderAccountDetails(user);
