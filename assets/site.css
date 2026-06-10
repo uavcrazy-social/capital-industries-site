@@ -911,6 +911,14 @@ body.modal-open {
   margin-top: 18px;
 }
 
+.store-modal-actions-single {
+  grid-template-columns: 1fr;
+}
+
+.username-setup-modal .store-modal-header {
+  padding-right: 0;
+}
+
 .button-ghost {
   border: 1px solid var(--line);
   color: var(--text);

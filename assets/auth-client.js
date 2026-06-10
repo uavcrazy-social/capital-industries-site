@@ -24,43 +24,14 @@ function accountRedirectUrl() {
   return window.location.origin + "/account/" + (query ? "?" + query : "");
 }
 
-async function lookupMinecraftUsername(username) {
+function normalizeUsername(username) {
   const trimmed = String(username || "").trim();
 
   if (!USERNAME_PATTERN.test(trimmed)) {
-    return {
-      valid: false,
-      username: trimmed,
-      error: "Username must be 3-16 letters, numbers, or underscores."
-    };
+    throw new Error("Username must be 3-16 letters, numbers, or underscores.");
   }
 
-  const response = await fetch(
-    "https://api.mojang.com/users/profiles/minecraft/" + encodeURIComponent(trimmed),
-    {
-      method: "GET",
-      headers: { Accept: "application/json" }
-    }
-  );
-
-  if (response.status === 204 || response.status === 404) {
-    return {
-      valid: false,
-      username: trimmed,
-      error: "That Minecraft username was not found."
-    };
-  }
-
-  if (!response.ok) {
-    throw new Error("Mojang lookup failed.");
-  }
-
-  const profile = await response.json();
-  return {
-    valid: true,
-    username: profile.name || trimmed,
-    uuid: profile.id || null
-  };
+  return trimmed;
 }
 
 async function getSession() {
@@ -102,6 +73,20 @@ async function getProfile() {
   return data;
 }
 
+function friendlyProfileError(error) {
+  const message = String(error?.message || error || "");
+
+  if (/failed to fetch|networkerror|load failed/i.test(message)) {
+    return new Error("Could not reach account services. Check your connection and try again.");
+  }
+
+  if (error?.code === "42501" || /row-level security|permission denied/i.test(message)) {
+    return new Error("Could not save username. Account permissions may need to be configured.");
+  }
+
+  return error instanceof Error ? error : new Error(message || "Could not save username.");
+}
+
 async function upsertProfile(minecraftUsername, usernameConfirmed) {
   const user = await getSessionUser();
 
@@ -109,11 +94,7 @@ async function upsertProfile(minecraftUsername, usernameConfirmed) {
     throw new Error("Continue with Google or Discord to access your account.");
   }
 
-  const lookup = await lookupMinecraftUsername(minecraftUsername);
-
-  if (!lookup.valid) {
-    throw new Error(lookup.error || "Minecraft username is not valid.");
-  }
+  const username = normalizeUsername(minecraftUsername);
 
   if (!usernameConfirmed) {
     throw new Error("Confirm that the Minecraft username is your current in-game name.");
@@ -121,17 +102,20 @@ async function upsertProfile(minecraftUsername, usernameConfirmed) {
 
   const { data, error } = await supabase
     .from("profiles")
-    .upsert({
-      id: user.id,
-      minecraft_username: lookup.username,
-      username_confirmed: true,
-      updated_at: new Date().toISOString()
-    })
+    .upsert(
+      {
+        id: user.id,
+        minecraft_username: username,
+        username_confirmed: true,
+        updated_at: new Date().toISOString()
+      },
+      { onConflict: "id" }
+    )
     .select("id, minecraft_username, username_confirmed, updated_at")
     .single();
 
   if (error) {
-    throw error;
+    throw friendlyProfileError(error);
   }
 
   return data;
@@ -197,8 +181,8 @@ function assignLiveApi() {
 
   auth.configured = true;
   auth.USERNAME_PATTERN = USERNAME_PATTERN;
+  auth.normalizeUsername = normalizeUsername;
   auth.accountRedirectUrl = accountRedirectUrl;
-  auth.lookupMinecraftUsername = lookupMinecraftUsername;
   auth.onAuthStateChange = onAuthStateChange;
   auth.signInWithGoogle = function () {
     return signInWithOAuth("google");
@@ -222,7 +206,7 @@ function assignOfflineApi(message) {
 
   auth.configured = false;
   auth.USERNAME_PATTERN = USERNAME_PATTERN;
-  auth.lookupMinecraftUsername = lookupMinecraftUsername;
+  auth.normalizeUsername = normalizeUsername;
   auth.accountRedirectUrl = accountRedirectUrl;
   auth.isLoggedIn = async function () {
     return false;

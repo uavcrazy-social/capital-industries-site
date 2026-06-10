@@ -56,8 +56,12 @@
     upsertProfile: function () {
       return Promise.reject(new Error("Account services are still loading."));
     },
-    lookupMinecraftUsername: function () {
-      return Promise.reject(new Error("Account services are still loading."));
+    normalizeUsername: function (username) {
+      const trimmed = String(username || "").trim();
+      if (!/^[A-Za-z0-9_]{3,16}$/.test(trimmed)) {
+        throw new Error("Username must be 3-16 letters, numbers, or underscores.");
+      }
+      return trimmed;
     },
     onAuthStateChange: function () {
       return { data: { subscription: { unsubscribe: function () {} } } };

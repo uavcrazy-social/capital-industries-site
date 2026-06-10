@@ -42,7 +42,7 @@
 <p class="eyebrow">Capital Industries Account</p>
 <h1 class="page-title">Manage <span class="accent">access</span></h1>
 <p class="tagline">
-Continue with Google or Discord, then confirm your current Minecraft Java username for store checkout.
+Continue with Google or Discord, then confirm your exact in-game Java username once for store checkout.
 </p>
 </div>
 </section>
@@ -51,7 +51,7 @@ Continue with Google or Discord, then confirm your current Minecraft Java userna
 Account services are not available right now.
 </div>
 <div class="notice" hidden id="account-checkout-notice" data-reveal="">
-<strong>Account required to buy ranks.</strong> Continue with Google or Discord below, then link your Minecraft username before returning to the store.
+<strong>Account required to buy ranks.</strong> Sign in below, confirm your in-game name in the popup, then return to the store.
 </div>
 <div class="account-layout" data-reveal="">
 <article class="panel account-panel" id="auth-panel">
@@ -69,24 +69,6 @@ Continue with Discord
 </div>
 <p aria-live="polite" class="account-status" id="auth-status"></p>
 </article>
-<article class="panel account-panel" hidden id="onboarding-panel">
-<h2 class="link-title">Link Minecraft username</h2>
-<p class="link-text" id="onboarding-summary">Confirm your current in-game name before buying ranks.</p>
-<form class="account-form" id="onboarding-form" novalidate>
-<label class="store-label" for="onboarding-username">Minecraft Java username</label>
-<input autocomplete="username" class="store-input" id="onboarding-username" maxlength="16" name="minecraftUsername" placeholder="Example: Steve" required type="text"/>
-<p aria-live="polite" class="username-lookup" id="onboarding-username-lookup"></p>
-<label class="confirm-check" for="onboarding-username-confirmed">
-<input id="onboarding-username-confirmed" type="checkbox"/>
-<span>
-I confirm <strong id="onboarding-username-preview">this username</strong> is my current in-game name.
-If it is wrong, ranks may not apply correctly.
-</span>
-</label>
-<button class="button button-primary" disabled id="onboarding-submit" type="submit">Save and continue</button>
-<p aria-live="polite" class="account-status" id="onboarding-status"></p>
-</form>
-</article>
 <article class="panel account-panel" hidden id="account-session-panel">
 <div class="account-panel-header">
 <div>
@@ -102,11 +84,11 @@ If it is wrong, ranks may not apply correctly.
 <span class="account-meta-value" id="account-linked-username">—</span>
 </div>
 </div>
-<form class="account-form" id="profile-form" novalidate>
+<div id="profile-manage-section">
+<form class="account-form" hidden id="profile-form" novalidate>
 <h3 class="account-subtitle">Update in-game username</h3>
 <label class="store-label" for="profile-minecraft-username">Minecraft Java username</label>
 <input autocomplete="username" class="store-input" id="profile-minecraft-username" maxlength="16" name="minecraftUsername" required type="text"/>
-<p aria-live="polite" class="username-lookup" id="profile-username-lookup"></p>
 <label class="confirm-check" for="profile-username-confirmed">
 <input id="profile-username-confirmed" type="checkbox"/>
 <span>
@@ -117,10 +99,38 @@ I confirm <strong id="profile-username-preview">this username</strong> is my cur
 <p aria-live="polite" class="account-status" id="profile-status"></p>
 </form>
 <a class="button button-primary" href="/store/">Go to store</a>
+</div>
 </article>
 </div>
 </section>
 </main>
+<div aria-hidden="true" aria-labelledby="username-setup-title" aria-modal="true" class="store-modal username-setup-modal" hidden id="username-setup-modal" role="dialog">
+<div class="store-modal-backdrop"></div>
+<div class="store-modal-card" role="document">
+<div class="store-modal-header">
+<p class="eyebrow">Welcome</p>
+<h2 class="store-modal-title" id="username-setup-title">You're logged in</h2>
+<p class="store-modal-subtitle">
+Please enter your exact current <strong>Minecraft Java username</strong>. You only need to do this once. You can change it later from <strong>Account → Manage account</strong>.
+</p>
+</div>
+<form class="account-form" id="username-setup-form" novalidate>
+<label class="store-label" for="setup-username">Minecraft Java username</label>
+<input autocomplete="username" class="store-input" id="setup-username" maxlength="16" name="minecraftUsername" placeholder="Example: Steve" required type="text"/>
+<label class="confirm-check" for="setup-username-confirmed">
+<input id="setup-username-confirmed" type="checkbox"/>
+<span>
+I confirm <strong id="setup-username-preview">this username</strong> is my current in-game name.
+If it is wrong, ranks may not apply correctly.
+</span>
+</label>
+<p aria-live="polite" class="account-status" id="setup-modal-status"></p>
+<div class="store-modal-actions store-modal-actions-single">
+<button class="button button-primary" disabled id="setup-username-submit" type="submit">Save and continue</button>
+</div>
+</form>
+</div>
+</div>
 <footer class="footer">
 <div class="site-shell footer-inner">
 <span>Capital Industries · Season 3 Modded Minecraft</span>
