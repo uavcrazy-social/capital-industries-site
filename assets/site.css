@@ -468,6 +468,31 @@ h1, h2, h3, p { margin-top: 0; }
 .feature-title { margin-bottom: 10px; font-size: 1.18rem; }
 .feature-tile-large .feature-title { font-size: clamp(1.45rem, 3vw, 2.1rem); letter-spacing: -0.04em; }
 .feature-text { margin-bottom: 0; color: var(--muted); line-height: 1.58; }
+.feature-support-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.03);
+}
+.feature-support-row strong {
+  color: var(--text);
+  font-size: 0.92rem;
+}
+.feature-support-row span::after {
+  content: "·";
+  margin-left: 8px;
+  color: var(--muted-2);
+}
+.feature-support-row span:last-of-type::after {
+  content: "";
+  margin: 0;
+}
 
 .link-panel,
 .map-link-panel,
@@ -792,6 +817,14 @@ h1, h2, h3, p { margin-top: 0; }
   .feature-gallery,
   .feature-grid-three,
   .quick-links { grid-template-columns: 1fr; }
+  .feature-support-row {
+    display: grid;
+    gap: 6px;
+  }
+  .feature-support-row span::after {
+    content: "";
+    margin: 0;
+  }
   .feature-tile-large,
   .feature-tile-wide { grid-column: span 1; grid-row: span 1; }
   .orbit-card { width: min(230px, 72vw); }
