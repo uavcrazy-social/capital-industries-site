@@ -1,7 +1,4 @@
 const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,16}$/;
-const MODAL_CLOSE_DELAY_MS = 190;
-let setupModalBusy = false;
-let setupCloseTimer = 0;
 
 function byId(id) {
   return document.getElementById(id);
@@ -67,56 +64,19 @@ function providerLabel(user) {
   return "OAuth";
 }
 
-function getSetupModal() {
-  return byId("username-setup-modal");
-}
-
-function openUsernameSetupModal() {
-  const modal = getSetupModal();
-
-  if (!modal || setupModalBusy) {
-    return;
+async function promptUsernameSetupIfNeeded() {
+  if (window.CapitalProfileSetup && typeof window.CapitalProfileSetup.refresh === "function") {
+    await window.CapitalProfileSetup.refresh();
   }
-
-  window.clearTimeout(setupCloseTimer);
-  setStatus("setup-modal-status", "");
-  modal.hidden = false;
-  modal.setAttribute("aria-hidden", "false");
-  document.body.classList.add("modal-open");
-
-  window.requestAnimationFrame(function () {
-    modal.classList.add("is-open");
-  });
-
-  window.setTimeout(function () {
-    const input = byId("setup-username");
-    if (input) {
-      input.focus();
-    }
-  }, 90);
-}
-
-function closeUsernameSetupModal(force) {
-  const modal = getSetupModal();
-
-  if (!modal || setupModalBusy && !force) {
-    return;
-  }
-
-  modal.classList.remove("is-open");
-  modal.setAttribute("aria-hidden", "true");
-  document.body.classList.remove("modal-open");
-
-  setupCloseTimer = window.setTimeout(function () {
-    modal.hidden = true;
-    setStatus("setup-modal-status", "");
-  }, MODAL_CLOSE_DELAY_MS);
 }
 
 async function renderSignedOut() {
-  closeUsernameSetupModal(true);
   setPanelHidden("account-session-panel", true);
   setPanelHidden("auth-panel", false);
+
+  if (window.CapitalProfileSetup && typeof window.CapitalProfileSetup.close === "function") {
+    window.CapitalProfileSetup.close(true);
+  }
 }
 
 async function renderSignedIn(user, profile, options) {
@@ -153,11 +113,10 @@ async function renderSignedIn(user, profile, options) {
     }
 
     updateProfileSubmitState();
-    closeUsernameSetupModal(true);
     return;
   }
 
-  openUsernameSetupModal();
+  await promptUsernameSetupIfNeeded();
 }
 
 function showCheckoutNotice() {
@@ -224,23 +183,6 @@ async function refreshAccountView() {
   });
 }
 
-function updateSetupSubmitState() {
-  const input = byId("setup-username");
-  const confirmed = byId("setup-username-confirmed");
-  const submit = byId("setup-username-submit");
-  const preview = byId("setup-username-preview");
-  const username = input ? input.value.trim() : "";
-  const valid = USERNAME_PATTERN.test(username);
-
-  if (preview) {
-    preview.textContent = username || "this username";
-  }
-
-  if (submit) {
-    submit.disabled = setupModalBusy || !valid || !(confirmed && confirmed.checked);
-  }
-}
-
 function updateProfileSubmitState() {
   const input = byId("profile-minecraft-username");
   const confirmed = byId("profile-username-confirmed");
@@ -256,71 +198,6 @@ function updateProfileSubmitState() {
   if (submit) {
     submit.disabled = !valid || !(confirmed && confirmed.checked);
   }
-}
-
-function bindSetupModalForm() {
-  const form = byId("username-setup-form");
-  const input = byId("setup-username");
-  const confirmed = byId("setup-username-confirmed");
-  const submit = byId("setup-username-submit");
-
-  if (input) {
-    input.addEventListener("input", function () {
-      if (confirmed) {
-        confirmed.checked = false;
-      }
-      updateSetupSubmitState();
-    });
-  }
-
-  if (confirmed) {
-    confirmed.addEventListener("change", updateSetupSubmitState);
-  }
-
-  if (form) {
-    form.addEventListener("submit", async function (event) {
-      event.preventDefault();
-      setStatus("setup-modal-status", "");
-      setupModalBusy = true;
-      setBusy(form, true);
-      updateSetupSubmitState();
-
-      try {
-        await window.CapitalAuth.upsertProfile(
-          byId("setup-username").value.trim(),
-          Boolean(byId("setup-username-confirmed").checked)
-        );
-
-        closeUsernameSetupModal(true);
-
-        const returnUrl = new URLSearchParams(window.location.search).get("return");
-
-        if (returnUrl && returnUrl.charAt(0) === "/" && returnUrl.indexOf("//") !== 0) {
-          window.location.href = returnUrl;
-          return;
-        }
-
-        await refreshAccountView();
-        setStatus("profile-status", "In-game username saved.", "success");
-      } catch (error) {
-        setStatus("setup-modal-status", error.message || "Could not save username.", "error");
-      } finally {
-        setupModalBusy = false;
-        setBusy(form, false);
-        updateSetupSubmitState();
-      }
-    });
-  }
-
-  if (submit) {
-    submit.addEventListener("click", function () {
-      if (form) {
-        form.requestSubmit();
-      }
-    });
-  }
-
-  updateSetupSubmitState();
 }
 
 function bindProfileForm() {
@@ -378,7 +255,6 @@ async function boot() {
 
   await window.CapitalAuth.ready();
 
-  bindSetupModalForm();
   bindProfileForm();
 
   const googleButton = byId("google-sign-in");
@@ -417,6 +293,10 @@ async function boot() {
       refreshAccountView();
     });
   }
+
+  window.addEventListener("capital:username-setup-complete", function () {
+    refreshAccountView();
+  });
 
   await refreshAccountView();
 }

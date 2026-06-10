@@ -28,15 +28,6 @@
     });
   }
 
-  function closeAccountMenu(menu, toggle) {
-    if (!menu || !toggle) {
-      return;
-    }
-
-    menu.hidden = true;
-    toggle.setAttribute("aria-expanded", "false");
-  }
-
   function buildLoginButton() {
     const link = document.createElement("a");
     link.className = "nav-link nav-login-button";
@@ -61,15 +52,16 @@
     toggle.type = "button";
     toggle.className = "nav-link nav-account-toggle";
     toggle.setAttribute("aria-haspopup", "true");
-    toggle.setAttribute("aria-expanded", "false");
     toggle.innerHTML =
       '<img alt="" class="nav-icon" src="/assets/icons/community.svg"/> Account';
 
     const menu = document.createElement("div");
     menu.className = "nav-account-menu";
-    menu.hidden = true;
 
-    const username = profile && profile.minecraft_username ? profile.minecraft_username : "Account";
+    const username =
+      profile && profile.minecraft_username
+        ? profile.minecraft_username
+        : "Set in-game name";
     const meta = document.createElement("p");
     meta.className = "nav-account-menu-meta";
     meta.textContent = username;
@@ -90,29 +82,11 @@
     menu.append(meta, manage, store, signOut);
     wrap.append(toggle, menu);
 
-    toggle.addEventListener("click", function () {
-      const open = toggle.getAttribute("aria-expanded") === "true";
-      toggle.setAttribute("aria-expanded", open ? "false" : "true");
-      menu.hidden = open;
-    });
-
     signOut.addEventListener("click", async function () {
       if (window.CapitalAuth && window.CapitalAuth.signOut) {
         await window.CapitalAuth.signOut();
       }
       window.location.href = "/account/";
-    });
-
-    document.addEventListener("click", function (event) {
-      if (!wrap.contains(event.target)) {
-        closeAccountMenu(menu, toggle);
-      }
-    });
-
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape") {
-        closeAccountMenu(menu, toggle);
-      }
     });
 
     return wrap;

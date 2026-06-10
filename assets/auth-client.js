@@ -168,6 +168,28 @@ async function isLoggedIn() {
   return Boolean(await getSessionUser());
 }
 
+async function notifyUsernameSetupIfNeeded() {
+  if (!supabase) {
+    return;
+  }
+
+  try {
+    const user = await getSessionUser();
+
+    if (!user) {
+      return;
+    }
+
+    if (await hasCompleteProfile()) {
+      return;
+    }
+
+    window.dispatchEvent(new CustomEvent("capital:username-setup-required"));
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 function onAuthStateChange(callback) {
   if (!supabase) {
     return { data: { subscription: { unsubscribe: function () {} } } };
@@ -267,6 +289,17 @@ async function boot() {
 
     await supabase.auth.getSession();
     assignLiveApi();
+    await notifyUsernameSetupIfNeeded();
+
+    supabase.auth.onAuthStateChange(function (event) {
+      if (
+        event === "SIGNED_IN" ||
+        event === "INITIAL_SESSION" ||
+        event === "USER_UPDATED"
+      ) {
+        notifyUsernameSetupIfNeeded();
+      }
+    });
   } catch (error) {
     console.error(error);
     assignOfflineApi("Account services failed to load.");

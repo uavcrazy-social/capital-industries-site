@@ -104,33 +104,6 @@ I confirm <strong id="profile-username-preview">this username</strong> is my cur
 </div>
 </section>
 </main>
-<div aria-hidden="true" aria-labelledby="username-setup-title" aria-modal="true" class="store-modal username-setup-modal" hidden id="username-setup-modal" role="dialog">
-<div class="store-modal-backdrop"></div>
-<div class="store-modal-card" role="document">
-<div class="store-modal-header">
-<p class="eyebrow">Welcome</p>
-<h2 class="store-modal-title" id="username-setup-title">You're logged in</h2>
-<p class="store-modal-subtitle">
-Please enter your exact current <strong>Minecraft Java username</strong>. You only need to do this once. You can change it later from <strong>Account → Manage account</strong>.
-</p>
-</div>
-<form class="account-form" id="username-setup-form" novalidate>
-<label class="store-label" for="setup-username">Minecraft Java username</label>
-<input autocomplete="username" class="store-input" id="setup-username" maxlength="16" name="minecraftUsername" placeholder="Example: Steve" required type="text"/>
-<label class="confirm-check" for="setup-username-confirmed">
-<input id="setup-username-confirmed" type="checkbox"/>
-<span>
-I confirm <strong id="setup-username-preview">this username</strong> is my current in-game name.
-If it is wrong, ranks may not apply correctly.
-</span>
-</label>
-<p aria-live="polite" class="account-status" id="setup-modal-status"></p>
-<div class="store-modal-actions store-modal-actions-single">
-<button class="button button-primary" disabled id="setup-username-submit" type="submit">Save and continue</button>
-</div>
-</form>
-</div>
-</div>
 <footer class="footer">
 <div class="site-shell footer-inner">
 <span>Capital Industries · Season 3 Modded Minecraft</span>
@@ -148,6 +121,7 @@ If it is wrong, ranks may not apply correctly.
 <script src="/assets/supabase-config.js"></script>
 <script defer src="/assets/site-nav.js"></script>
 <script type="module" src="/assets/auth-client.js"></script>
+<script type="module" src="/assets/profile-setup.js"></script>
 <script type="module" src="/assets/account.js"></script>
 <script defer src="/assets/site.js"></script>
 </body>
