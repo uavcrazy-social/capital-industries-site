@@ -1,0 +1,2 @@
+[functions.tebex-webhook]
+verify_jwt = false

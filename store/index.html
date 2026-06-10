@@ -65,8 +65,13 @@ without requiring a monthly rank.
 </div>
 </section>
 <section class="site-shell section">
+<div class="notice notice-success store-active-rank-banner" data-reveal="" hidden id="store-active-rank-banner">
+<strong id="store-active-rank-title">You have an active rank.</strong>
+<span id="store-active-rank-detail">Only one rank subscription is allowed at a time.</span>
+<a href="/account/">View account</a>
+</div>
 <div aria-label="Monthly server ranks" class="rank-grid rank-grid-four">
-<article class="rank-card rank-player" data-reveal="">
+<article class="rank-card rank-player" data-rank-key="player" data-reveal="">
 <h2 class="rank-name">Player</h2>
 <p class="price">Free</p>
 <p class="section-text">
@@ -84,7 +89,7 @@ Included by default
 </button>
 </div>
 </article>
-<article class="rank-card rank-member" data-reveal="">
+<article class="rank-card rank-member" data-rank-key="member" data-reveal="">
 <h2 class="rank-name">Member</h2>
 <p class="price">$5.99 <small>/ mo</small></p>
 <p class="section-text">
@@ -105,7 +110,7 @@ Buy Member
 </button>
 </div>
 </article>
-<article class="rank-card rank-premium" data-reveal="">
+<article class="rank-card rank-premium" data-rank-key="premium" data-reveal="">
 <h2 class="rank-name">Premium</h2>
 <p class="price">$10.99 <small>/ mo</small></p>
 <p class="section-text">
@@ -126,7 +131,7 @@ Buy Premium
 </button>
 </div>
 </article>
-<article class="rank-card rank-elite" data-reveal="">
+<article class="rank-card rank-elite" data-rank-key="elite" data-reveal="">
 <h2 class="rank-name">Elite</h2>
 <p class="price">$20.99 <small>/ mo</small></p>
 <p class="section-text">
@@ -155,7 +160,7 @@ Buy Elite
 in-game username before buying a rank.
 </div>
 <div class="notice" data-reveal="">
-<strong>Note:</strong> Ranks are monthly support tiers. Tebex handles checkout and payment processing.
+<strong>Note:</strong> Ranks are monthly support tiers. Secure checkout handles payment processing.
 Purchases require a signed-in account with a linked Minecraft username.
 </div>
 </section>
@@ -184,7 +189,7 @@ Purchases require a signed-in account with a linked Minecraft username.
 <p class="store-modal-subtitle">
 You are buying <strong id="checkout-package-name">a rank</strong>
 <span id="checkout-package-price"></span> for
-<strong id="checkout-linked-username">your player</strong>. Tebex will attach the rank to that in-game name.
+<strong id="checkout-linked-username">your player</strong>. The rank will be attached to that in-game name.
 </p>
 </div>
 <p class="username-help">Username is linked to your account. Update it on the

@@ -81,7 +81,7 @@ function friendlyProfileError(error) {
   }
 
   if (error?.code === "42501" || /row-level security|permission denied/i.test(message)) {
-    return new Error("Could not save username. Account permissions may need to be configured.");
+    return new Error("Could not save username right now. Please try again later.");
   }
 
   if (error?.code === "23505" || /duplicate key|unique constraint/i.test(message)) {
@@ -155,7 +155,7 @@ async function upsertProfile(minecraftUsername, usernameConfirmed) {
 
 async function signInWithOAuth(provider) {
   if (!supabase) {
-    throw new Error("Supabase is not configured.");
+    throw new Error("Account sign-in is temporarily unavailable.");
   }
 
   const { error } = await supabase.auth.signInWithOAuth({
@@ -343,7 +343,7 @@ function assignLiveApi() {
 
 function assignOfflineApi(message) {
   const auth = window.CapitalAuth;
-  const errorMessage = message || "Supabase is not configured.";
+  const errorMessage = message || "Account services are temporarily unavailable.";
 
   auth.configured = false;
   auth.USERNAME_PATTERN = USERNAME_PATTERN;
@@ -401,7 +401,7 @@ async function boot() {
     anonKey.indexOf("REPLACE_WITH_") === -1;
 
   if (!isConfigured) {
-    assignOfflineApi("Supabase is not configured.");
+    assignOfflineApi("Account services are temporarily unavailable.");
     window.CapitalAuth.markReady();
     return;
   }

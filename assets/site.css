@@ -608,6 +608,52 @@ h1, h2, h3, p { margin-top: 0; }
 .perk-list li::before { position: absolute; left: 0; color: var(--orange-bright); content: "✓"; font-weight: 900; }
 .rank-actions { margin-top: auto; padding-top: 24px; }
 .rank-actions .button { width: 100%; }
+.rank-card-active {
+  border-color: rgba(255, 138, 24, 0.52);
+  box-shadow: 0 0 0 1px rgba(255, 138, 24, 0.18), 0 22px 54px rgba(255, 138, 24, 0.14);
+}
+.rank-card-active:hover { transform: none; }
+.rank-card-blocked { opacity: 0.78; }
+.rank-card-blocked:hover { transform: none; border-color: var(--line); }
+.rank-current-badge { margin: 0 0 12px; }
+.rank-status-note {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+.button-rank-owned {
+  border-color: rgba(255, 138, 24, 0.42);
+  color: var(--orange-bright);
+  background: rgba(255, 138, 24, 0.1);
+  cursor: default;
+}
+.button-rank-blocked {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+.store-active-rank-banner {
+  margin-top: 0;
+  margin-bottom: 18px;
+}
+.store-active-rank-banner a,
+.notice-success a {
+  color: var(--orange-bright);
+  font-weight: 700;
+  text-decoration: none;
+}
+.store-active-rank-banner a:hover,
+.notice-success a:hover,
+.store-active-rank-banner a:focus-visible,
+.notice-success a:focus-visible {
+  text-decoration: underline;
+  outline: none;
+}
+.notice-success {
+  border-color: rgba(255, 138, 24, 0.34);
+  color: var(--text);
+  background: rgba(255, 138, 24, 0.08);
+}
 .button-display-only { pointer-events: none; }
 .notice { margin-top: 24px; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-md); color: var(--muted); background: rgba(255, 255, 255, 0.035); line-height: 1.58; }
 

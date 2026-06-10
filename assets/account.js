@@ -145,6 +145,7 @@ async function renderAccountDetails(user) {
     if (typeof window.CapitalAuth.getPurchaseHistory === "function") {
       purchases = await window.CapitalAuth.getPurchaseHistory(25);
     }
+
   } catch (error) {
     console.error(error);
   }
@@ -322,7 +323,7 @@ async function refreshAccountView() {
     if (warning) {
       warning.hidden = false;
       warning.textContent =
-        "Supabase is not configured yet. Set CAPITAL_SUPABASE_URL and CAPITAL_SUPABASE_ANON_KEY in assets/supabase-config.js.";
+        "Account sign-in is temporarily unavailable. Please try again later.";
     }
     await renderSignedOut();
     return;

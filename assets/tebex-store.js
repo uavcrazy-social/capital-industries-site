@@ -58,7 +58,6 @@
 
   var linkedUsername = "";
   var activeSubscription = null;
-
   function waitForAuth() {
     return new Promise(function (resolve) {
       function check() {
@@ -102,7 +101,8 @@
       setAuthNoticeVisible(true);
       activeSubscription = null;
       linkedUsername = "";
-      updateRankButtons(false, null);
+      updateRankUI(false, null);
+      updateActiveRankBanner(null);
       return;
     }
 
@@ -117,13 +117,141 @@
           : null;
 
       setAuthNoticeVisible(!complete);
-      updateRankButtons(complete, activeSubscription);
+      updateRankUI(complete, activeSubscription);
+      updateActiveRankBanner(activeSubscription);
       updateConfirmState();
     } catch (error) {
       console.error(error);
       setStatus(error.message || "Could not load store account state.");
-      updateRankButtons(false, null);
+      updateRankUI(false, null);
+      updateActiveRankBanner(null);
     }
+  }
+
+  function cleanCheckoutReturnParam() {
+    var params = new URLSearchParams(window.location.search);
+
+    if (!params.has("checkout")) {
+      return;
+    }
+
+    params.delete("checkout");
+    var query = params.toString();
+    var url = window.location.pathname + (query ? "?" + query : "") + window.location.hash;
+    window.history.replaceState({}, "", url);
+  }
+
+  function updateActiveRankBanner(subscription) {
+    var activeBanner = document.getElementById("store-active-rank-banner");
+    var activeTitle = document.getElementById("store-active-rank-title");
+    var activeDetail = document.getElementById("store-active-rank-detail");
+
+    cleanCheckoutReturnParam();
+
+    if (!subscription) {
+      if (activeBanner) {
+        activeBanner.hidden = true;
+      }
+      return;
+    }
+
+    if (activeBanner) {
+      activeBanner.hidden = false;
+    }
+
+    if (activeTitle) {
+      activeTitle.textContent =
+        "You have " +
+        (PACKAGE_DISPLAY[subscription.rank_key] || { name: "a rank" }).name +
+        " active.";
+    }
+
+    if (activeDetail) {
+      activeDetail.textContent =
+        "This is your current plan for " +
+        (subscription.minecraft_username || linkedUsername || "your account") +
+        ". Cancel your current plan before buying a different rank.";
+    }
+  }
+
+  function getRankCard(packageKey) {
+    return document.querySelector('[data-rank-key="' + packageKey + '"]');
+  }
+
+  function clearRankCardDecorations(card) {
+    if (!card) {
+      return;
+    }
+
+    card.classList.remove("rank-card-active", "rank-card-blocked");
+
+    card.querySelectorAll(".rank-current-badge, .rank-status-note").forEach(function (node) {
+      node.remove();
+    });
+  }
+
+  function updateRankUI(canCheckout, subscription) {
+    var buttons = document.querySelectorAll("[data-tebex-package]");
+
+    ["member", "premium", "elite"].forEach(function (packageKey) {
+      clearRankCardDecorations(getRankCard(packageKey));
+    });
+
+    buttons.forEach(function (button) {
+      rememberButtonDefault(button);
+      restoreButtonDefault(button);
+      button.classList.remove("button-rank-owned", "button-rank-blocked", "button-primary");
+
+      var packageKey = button.getAttribute("data-tebex-package");
+      var card = getRankCard(packageKey);
+      var disabled = !RANK_PURCHASES_ENABLED || !canCheckout;
+
+      if (subscription && subscription.rank_key) {
+        var activeName =
+          (PACKAGE_DISPLAY[subscription.rank_key] || { name: "rank" }).name;
+
+        if (subscription.rank_key === packageKey) {
+          disabled = true;
+          button.textContent = "Your current plan";
+          button.classList.add("button-rank-owned");
+
+          if (card) {
+            card.classList.add("rank-card-active");
+            var badge = document.createElement("span");
+            badge.className = "rank-current-badge status-pill";
+            badge.textContent = "Your current plan";
+            var price = card.querySelector(".price");
+            if (price) {
+              price.insertAdjacentElement("afterend", badge);
+            } else {
+              card.insertBefore(badge, card.firstChild);
+            }
+          }
+        } else {
+          disabled = true;
+          button.textContent = "Cancel " + activeName + " first";
+          button.classList.add("button-rank-blocked");
+
+          if (card) {
+            card.classList.add("rank-card-blocked");
+            var note = document.createElement("p");
+            note.className = "rank-status-note";
+            note.textContent =
+              "You already have " +
+              activeName +
+              " active. Cancel your current plan before buying another rank.";
+            var actions = card.querySelector(".rank-actions");
+            if (actions) {
+              actions.insertBefore(note, actions.firstChild);
+            }
+          }
+        }
+      } else {
+        button.classList.add("button-primary");
+      }
+
+      button.disabled = disabled;
+    });
   }
 
   function getUsername() {
@@ -150,7 +278,7 @@
 
   function assertConfigured() {
     if (!TEBEX_PUBLIC_TOKEN || TEBEX_PUBLIC_TOKEN.indexOf("REPLACE_WITH_") === 0) {
-      throw new Error("Tebex public token is not configured.");
+      throw new Error("Checkout is temporarily unavailable. Please try again later.");
     }
   }
 
@@ -158,7 +286,7 @@
     var packageId = PACKAGE_IDS[packageKey];
 
     if (!packageId || packageId.indexOf("REPLACE_WITH_") === 0) {
-      throw new Error("Tebex package ID is not configured for " + packageKey + ".");
+      throw new Error("This rank is temporarily unavailable. Please try again later.");
     }
 
     return packageId;
@@ -169,35 +297,6 @@
 
     buttons.forEach(function (button) {
       button.setAttribute("aria-busy", busy ? "true" : "false");
-    });
-  }
-
-  function updateRankButtons(canCheckout, subscription) {
-    var buttons = document.querySelectorAll("[data-tebex-package]");
-
-    buttons.forEach(function (button) {
-      rememberButtonDefault(button);
-      restoreButtonDefault(button);
-
-      var packageKey = button.getAttribute("data-tebex-package");
-      var disabled = !RANK_PURCHASES_ENABLED || !canCheckout;
-      var label = "Buy rank";
-
-      if (subscription && subscription.rank_key) {
-        if (subscription.rank_key === packageKey) {
-          disabled = true;
-          label = "Current rank";
-        } else {
-          disabled = true;
-          label = "One rank at a time";
-        }
-      }
-
-      button.disabled = disabled;
-
-      if (disabled && subscription) {
-        button.textContent = label;
-      }
     });
   }
 
@@ -323,7 +422,7 @@
         payload.detail ||
         payload.message ||
         payload.error ||
-        "Tebex request failed."
+        "Checkout request failed."
       );
     }
 
@@ -426,7 +525,7 @@
 
   function launchCheckout(ident) {
     if (!window.Tebex || !window.Tebex.checkout) {
-      throw new Error("Tebex checkout script did not load.");
+      throw new Error("Checkout could not be loaded.");
     }
 
     window.Tebex.checkout.init({
@@ -452,7 +551,7 @@
     try {
       setButtonsBusy(true);
       setModalBusy(true);
-      setStatus("Creating secure Tebex checkout...");
+      setStatus("Creating secure checkout...");
 
       assertConfigured();
       await refreshStoreAccess();
@@ -466,7 +565,7 @@
       var basket = await createBasket(username, user ? user.id : "");
 
       if (!basket || !basket.ident) {
-        throw new Error("Tebex did not return a basket ident.");
+        throw new Error("Checkout could not be started.");
       }
 
       var checkoutBasket = await addPackageToBasket(basket, packageId);
@@ -496,7 +595,7 @@
         }
       }
 
-      setStatus(error.message || "Unable to open Tebex checkout.");
+      setStatus(error.message || "Unable to open checkout.");
     } finally {
       setModalBusy(false);
       setButtonsBusy(false);
@@ -530,7 +629,7 @@
       await waitForAuth();
 
       if (!window.CapitalAuth || !window.CapitalAuth.configured) {
-        setStatus("Account sign-in is not configured yet.");
+        setStatus("Sign-in is temporarily unavailable. Please try again later.");
         return;
       }
 
