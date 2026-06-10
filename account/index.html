@@ -27,10 +27,10 @@
 </a>
 <nav aria-label="Primary navigation" class="nav-links">
 <a class="nav-link nav-link-cta" data-nav-key="play" href="/download"><img alt="" class="nav-icon nav-icon-play" src="/assets/icons/play.svg"/> Play</a>
-<a class="nav-link" data-nav-key="map" href="https://map.capitalindustries.net/" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/bluemap-logo.png"/> Map</a>
-<a class="nav-link" data-nav-key="discord" href="https://discord.gg/jj7fFEYYfk" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/discord-logo.png"/> Discord</a>
-<a class="nav-link" data-nav-key="donate" href="https://ko-fi.com/dtmpro621" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/icons/kofi.svg"/> Donate</a>
-<a class="nav-link nav-link-cta" data-nav-key="store" href="/store"><img alt="" class="nav-icon" src="/assets/icons/store.svg"/> Store</a>
+<a class="nav-link nav-link-cta-secondary" data-nav-key="store" href="/store"><img alt="" class="nav-icon" src="/assets/icons/store.svg"/> Store</a>
+<a class="nav-link nav-link-small" data-nav-key="map" href="https://map.capitalindustries.net/" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/bluemap-logo.png"/> Map</a>
+<a class="nav-link nav-link-small" data-nav-key="discord" href="https://discord.gg/jj7fFEYYfk" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/discord-logo.png"/> Discord</a>
+<a class="nav-link nav-link-small" data-nav-key="donate" href="https://ko-fi.com/dtmpro621" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/icons/kofi.svg"/> Donate</a>
 <span class="nav-divider" aria-hidden="true"></span>
 <div class="nav-account-slot" id="nav-account-slot"></div>
 </nav>
@@ -39,10 +39,10 @@
 <main>
 <section class="site-shell hero hero-compact">
 <div data-reveal="">
-<p class="eyebrow">Capital Industries Account</p>
-<h1 class="page-title">Manage <span class="accent">access</span></h1>
+<p class="eyebrow">Capital Industries</p>
+<h1 class="page-title">Sign in</h1>
 <p class="tagline">
-Continue with Google or Discord, then confirm your exact in-game Java username once for store checkout.
+Use Google or Discord to link your Minecraft username and buy ranks.
 </p>
 </div>
 </section>
@@ -60,8 +60,7 @@ Account services are not available right now.
 <p class="link-text">Checking your sign-in status…</p>
 </article>
 <article class="panel account-panel" hidden id="auth-panel">
-<h2 class="link-title">Login or create account</h2>
-<p class="link-text">Public login is Google or Discord only.</p>
+<h2 class="link-title">Sign in</h2>
 <div class="account-oauth-actions">
 <button class="button oauth-button oauth-google" id="google-sign-in" type="button">
 <img alt="" class="oauth-icon" src="/assets/icons/google.svg"/>
@@ -77,19 +76,18 @@ Continue with Discord
 <article class="panel account-panel" hidden id="account-session-panel">
 <div class="account-panel-header">
 <div>
-<p class="eyebrow">Signed in</p>
-<h2 class="link-title" id="account-display-name">Account</h2>
-<p class="link-text" id="account-summary">Session loaded.</p>
+<h2 class="link-title">Account</h2>
+<p class="link-text" id="account-summary">Signed in as —</p>
 </div>
 <button class="button button-ghost" id="logout-button" type="button">Sign out</button>
 </div>
 <div class="account-meta">
 <div class="account-meta-row">
-<span class="account-meta-label">Linked in-game name</span>
+<span class="account-meta-label">Minecraft username</span>
 <span class="account-meta-value" id="account-linked-username">—</span>
 </div>
 <div class="account-meta-row">
-<span class="account-meta-label">Sign-in methods</span>
+<span class="account-meta-label">Connected</span>
 <span class="account-meta-value" id="account-connected-providers">—</span>
 </div>
 </div>
@@ -99,28 +97,28 @@ Continue with Discord
 <p class="link-text" id="account-subscription-empty">No active rank subscription yet.</p>
 <div hidden id="account-subscription-details">
 <p class="account-subscription-rank" id="account-subscription-rank">—</p>
-<p class="link-text" id="account-subscription-meta">—</p>
-<p class="link-text account-policy-note">
-Only one rank subscription is allowed at a time. To change ranks, cancel your current plan first, then purchase a new rank. Cancelling a subscription will remove all your rank perks and will NOT be refuded!
-</p>
+<p class="link-text" id="account-subscription-meta">Next renewal: —</p>
 <div class="account-subscription-actions" id="subscription-manage">
-<button class="button button-ghost" id="cancel-subscription-button" type="button">Manage / cancel subscription</button>
+<button class="button button-ghost" id="cancel-subscription-button" type="button">Manage billing in Tebex</button>
 <p aria-live="polite" class="account-status" id="cancel-subscription-status"></p>
 </div>
 </div>
 </div>
 </section>
 <section class="account-section account-policy-panel">
-<h3 class="account-subtitle">Account rules</h3>
+<details class="account-rules-details">
+<summary>Account rules</summary>
 <ul class="account-policy-list">
 <li>Each Minecraft username can only be linked to one site account.</li>
 <li>Google and Discord create separate logins unless manually merged by support.</li>
 <li>Only one paid rank subscription is allowed per account and in-game name.</li>
 </ul>
+</details>
 </section>
 <div id="profile-manage-section">
+<button class="button button-ghost" id="change-username-button" type="button">Change username</button>
 <form class="account-form" hidden id="profile-form" novalidate>
-<h3 class="account-subtitle">Update in-game username</h3>
+<h3 class="account-subtitle">Minecraft username</h3>
 <label class="store-label" for="profile-minecraft-username">Minecraft Java username</label>
 <input autocomplete="username" class="store-input" id="profile-minecraft-username" maxlength="16" name="minecraftUsername" required type="text"/>
 <label class="confirm-check" for="profile-username-confirmed">
@@ -132,7 +130,6 @@ I confirm <strong id="profile-username-preview">this username</strong> is my cur
 <button class="button button-primary" disabled id="profile-submit" type="submit">Save username</button>
 <p aria-live="polite" class="account-status" id="profile-status"></p>
 </form>
-<a class="button button-primary" href="/store/">Go to store</a>
 </div>
 </article>
 </div>
@@ -140,15 +137,12 @@ I confirm <strong id="profile-username-preview">this username</strong> is my cur
 </main>
 <footer class="footer">
 <div class="site-shell footer-inner">
-<span>Capital Industries · Season 3 Modded Minecraft</span>
+<span>Capital Industries Season 3</span>
 <nav aria-label="Footer links" class="footer-links">
-<a href="/download">Download</a>
-<a href="/store">Ranks</a>
-<a href="/account">Account</a>
-<a href="https://map.capitalindustries.net/" rel="noopener noreferrer" target="_blank">Live Map</a>
 <a href="https://discord.gg/jj7fFEYYfk" rel="noopener noreferrer" target="_blank">Discord</a>
-<a href="https://www.curseforge.com/minecraft/modpacks/capital-industries-server" rel="noopener noreferrer" target="_blank">CurseForge</a>
-<a href="https://www.modpackindex.com/modpack/117341/capital-industries-server" rel="noopener noreferrer" target="_blank">Modpack Index</a>
+<a href="https://map.capitalindustries.net/" rel="noopener noreferrer" target="_blank">Map</a>
+<a href="/store">Store</a>
+<a href="https://discord.gg/jj7fFEYYfk" rel="noopener noreferrer" target="_blank">Support</a>
 </nav>
 </div>
 </footer>

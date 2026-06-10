@@ -44,51 +44,31 @@
     return link;
   }
 
-  function buildAccountDropdown(profile) {
+  function buildAccountState(profile) {
     const wrap = document.createElement("div");
-    wrap.className = "nav-account-wrap";
+    wrap.className = "nav-account-inline";
 
-    const toggle = document.createElement("button");
-    toggle.type = "button";
-    toggle.className = "nav-link nav-account-toggle";
-    toggle.setAttribute("aria-haspopup", "true");
-    toggle.innerHTML =
-      '<img alt="" class="nav-icon" src="/assets/icons/community.svg"/> Account';
-
-    const menu = document.createElement("div");
-    menu.className = "nav-account-menu";
-
-    const username =
+    const username = document.createElement("span");
+    username.className = "nav-auth-name";
+    username.textContent =
       profile && profile.minecraft_username
         ? profile.minecraft_username
-        : "Set in-game name";
-    const meta = document.createElement("p");
-    meta.className = "nav-account-menu-meta";
-    meta.textContent = username;
+        : "Set username";
 
-    const manage = document.createElement("a");
-    manage.href = "/account/";
-    manage.textContent = "Manage account";
+    const separator = document.createElement("span");
+    separator.className = "nav-auth-separator";
+    separator.textContent = "/";
 
-    const store = document.createElement("a");
-    store.href = "/store/";
-    store.textContent = "Buy ranks";
+    const accountLink = document.createElement("a");
+    accountLink.className = "nav-link nav-account-link";
+    accountLink.href = "/account/";
+    accountLink.textContent = "Account";
 
-    const signOut = document.createElement("button");
-    signOut.type = "button";
-    signOut.className = "nav-account-signout";
-    signOut.textContent = "Sign out";
+    if (getNavKey() === "account") {
+      accountLink.classList.add("nav-link-active");
+    }
 
-    menu.append(meta, manage, store, signOut);
-    wrap.append(toggle, menu);
-
-    signOut.addEventListener("click", async function () {
-      if (window.CapitalAuth && window.CapitalAuth.signOut) {
-        await window.CapitalAuth.signOut();
-      }
-      window.location.href = "/account/";
-    });
-
+    wrap.append(username, separator, accountLink);
     return wrap;
   }
 
@@ -134,16 +114,7 @@
     }
 
     const profile = await auth.getProfile();
-    const dropdown = buildAccountDropdown(profile);
-
-    if (getNavKey() === "account") {
-      const toggle = dropdown.querySelector(".nav-account-toggle");
-      if (toggle) {
-        toggle.classList.add("nav-link-active");
-      }
-    }
-
-    slot.appendChild(dropdown);
+    slot.appendChild(buildAccountState(profile));
   }
 
   function clearNavAccountSlot() {

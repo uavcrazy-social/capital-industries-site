@@ -141,22 +141,16 @@ async function renderAccountDetails(user) {
       subscriptionDetails.hidden = false;
     }
 
+    const status = subscription.status || "active";
+    const statusText = status.charAt(0).toUpperCase() + status.slice(1);
     setText(
       "account-subscription-rank",
-      subscription.package_name || rankLabel(subscription.rank_key)
+      (subscription.package_name || rankLabel(subscription.rank_key)) + " · " + statusText
     );
-
-    const metaParts = [
-      "Status: " + (subscription.status || "active"),
-      "In-game: " + (subscription.minecraft_username || "—"),
-      "Started: " + formatDate(subscription.started_at)
-    ];
-
-    if (subscription.current_period_end) {
-      metaParts.push("Renews/ends: " + formatDate(subscription.current_period_end));
-    }
-
-    setText("account-subscription-meta", metaParts.join(" · "));
+    setText(
+      "account-subscription-meta",
+      "Next renewal: " + formatDate(subscription.current_period_end || subscription.started_at)
+    );
 
     const cancelButton = byId("cancel-subscription-button");
     if (cancelButton) {
@@ -200,19 +194,24 @@ async function renderSignedIn(user, profile, options) {
   setPanelHidden("auth-panel", true);
   setPanelHidden("account-session-panel", false);
 
-  setText("account-display-name", profile?.minecraft_username || "Account");
-  setText("account-summary", "Connected with " + providerLabel(user));
+  setText("account-summary", "Signed in as " + (profile?.minecraft_username || "Account"));
   setText("account-linked-username", profile?.minecraft_username || "—");
 
   const profileForm = byId("profile-form");
   const profileSection = byId("profile-manage-section");
+  const changeUsernameButton = byId("change-username-button");
 
   if (profileForm) {
-    profileForm.hidden = needsSetup;
+    profileForm.hidden = true;
   }
 
   if (profileSection) {
     profileSection.hidden = needsSetup;
+  }
+
+  if (changeUsernameButton) {
+    changeUsernameButton.hidden = needsSetup;
+    changeUsernameButton.textContent = "Change username";
   }
 
   await renderAccountDetails(user);
@@ -353,6 +352,14 @@ function bindProfileForm() {
   const form = byId("profile-form");
   const input = byId("profile-minecraft-username");
   const confirmed = byId("profile-username-confirmed");
+  const changeUsernameButton = byId("change-username-button");
+
+  if (changeUsernameButton && form) {
+    changeUsernameButton.addEventListener("click", function () {
+      form.hidden = !form.hidden;
+      changeUsernameButton.textContent = form.hidden ? "Change username" : "Hide username form";
+    });
+  }
 
   if (input) {
     input.addEventListener("input", function () {

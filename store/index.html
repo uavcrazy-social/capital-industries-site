@@ -27,10 +27,10 @@
 </a>
 <nav aria-label="Primary navigation" class="nav-links">
 <a class="nav-link nav-link-cta" data-nav-key="play" href="/download"><img alt="" class="nav-icon nav-icon-play" src="/assets/icons/play.svg"/> Play</a>
-<a class="nav-link" data-nav-key="map" href="https://map.capitalindustries.net/" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/bluemap-logo.png"/> Map</a>
-<a class="nav-link" data-nav-key="discord" href="https://discord.gg/jj7fFEYYfk" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/discord-logo.png"/> Discord</a>
-<a class="nav-link" data-nav-key="donate" href="https://ko-fi.com/dtmpro621" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/icons/kofi.svg"/> Donate</a>
-<a class="nav-link nav-link-cta" data-nav-key="store" href="/store"><img alt="" class="nav-icon" src="/assets/icons/store.svg"/> Store</a>
+<a class="nav-link nav-link-cta-secondary" data-nav-key="store" href="/store"><img alt="" class="nav-icon" src="/assets/icons/store.svg"/> Store</a>
+<a class="nav-link nav-link-small" data-nav-key="map" href="https://map.capitalindustries.net/" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/bluemap-logo.png"/> Map</a>
+<a class="nav-link nav-link-small" data-nav-key="discord" href="https://discord.gg/jj7fFEYYfk" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/brand/discord-logo.png"/> Discord</a>
+<a class="nav-link nav-link-small" data-nav-key="donate" href="https://ko-fi.com/dtmpro621" rel="noopener noreferrer" target="_blank"><img alt="" class="nav-icon" src="/assets/icons/kofi.svg"/> Donate</a>
 <span class="nav-divider" aria-hidden="true"></span>
 <div class="nav-account-slot" id="nav-account-slot"></div>
 </nav>
@@ -39,35 +39,14 @@
 <main>
 <section class="site-shell hero hero-compact">
 <div data-reveal="">
-<p class="eyebrow">Capital Industries Store</p>
-<h1 class="page-title">Support <span class="accent">Season 3</span></h1>
-<p class="tagline">
-Monthly ranks support the same Capital Industries server while providing convenience perks,
-claim limit increases, homes, badges, and command access.
-</p>
+<p class="eyebrow">Capital Industries</p>
+<h1 class="page-title">Store</h1>
 </div>
 </section>
 <section class="site-shell section">
-<div class="panel support-panel" data-reveal="">
-<div>
-<p class="eyebrow">Donations</p>
-<h2 class="link-title">Support Capital Industries directly.</h2>
-<p class="link-text">
-Ko-fi donations help cover hosting, server maintenance, and continued development
-without requiring a monthly rank.
-</p>
-</div>
-<div aria-label="Ko-fi donation widget" class="kofi-widget">
-<script type="text/javascript" src="https://storage.ko-fi.com/cdn/widget/Widget_2.js"></script><script type="text/javascript">kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'J3J21Y8VMR');kofiwidget2.draw();</script>
-<noscript><a class="button" href="https://ko-fi.com/dtmpro621" rel="noopener noreferrer" target="_blank">Support on Ko-fi</a></noscript>
-</div>
-</div>
-</section>
-<section class="site-shell section">
-<div class="notice notice-success store-active-rank-banner" data-reveal="" hidden id="store-active-rank-banner">
-<strong id="store-active-rank-title">You have an active rank.</strong>
-<span id="store-active-rank-detail">Only one rank subscription is allowed at a time.</span>
-<a href="/account/#subscription-manage">Manage subscription</a>
+<div class="notice store-auth-bar" data-reveal="" id="store-auth-bar">
+<span id="store-auth-bar-text">Sign in before checkout</span>
+<a href="/account/?return=/store/&reason=checkout" id="store-auth-bar-action">Sign in</a>
 </div>
 <div aria-label="Monthly server ranks" class="rank-grid rank-grid-four">
 <article class="rank-card rank-player" data-rank-key="player" data-reveal="">
@@ -91,17 +70,19 @@ Included by default
 <article class="rank-card rank-member" data-rank-key="member" data-reveal="">
 <h2 class="rank-name">Member</h2>
 <p class="price">$5.99 <small>/ mo</small></p>
-<p class="section-text">
-Entry support tier with extra homes, higher claim limits, and a Member badge.
-</p>
-<ul class="perk-list">
+<ul class="perk-list perk-list-short">
 <li>2 <code>/homes</code></li>
 <li>Up to 75 claims</li>
+<li>Member badge</li>
+</ul>
+<details class="perk-details">
+<summary>Full perks</summary>
+<ul class="perk-list">
 <li>Up to 10 force-loaded claims</li>
 <li><code>/hat</code> command</li>
 <li><code>/enderchest</code></li>
-<li>Member badge</li>
 </ul>
+</details>
 <div class="rank-actions">
 <button class="button button-primary" data-tebex-package="member" type="button">
 <img alt="" class="button-icon" src="/assets/icons/store.svg"/>
@@ -112,17 +93,19 @@ Buy Member
 <article class="rank-card rank-premium" data-rank-key="premium" data-reveal="">
 <h2 class="rank-name">Premium</h2>
 <p class="price">$10.99 <small>/ mo</small></p>
-<p class="section-text">
-Mid-tier rank with all Member perks, more homes, and utility command access.
-</p>
-<ul class="perk-list">
+<ul class="perk-list perk-list-short">
 <li>All Member perks</li>
 <li>Up to 100 claims</li>
-<li>Up to 15 force-loaded claims</li>
 <li>3 <code>/homes</code></li>
+</ul>
+<details class="perk-details">
+<summary>Full perks</summary>
+<ul class="perk-list">
+<li>Up to 15 force-loaded claims</li>
 <li><code>/open anvil</code>, <code>crafting</code>, <code>smithing</code>, <code>stonecutter</code></li>
 <li>Premium badge</li>
 </ul>
+</details>
 <div class="rank-actions">
 <button class="button button-primary" data-tebex-package="premium" type="button">
 <img alt="" class="button-icon" src="/assets/icons/store.svg"/>
@@ -133,18 +116,20 @@ Buy Premium
 <article class="rank-card rank-elite" data-rank-key="elite" data-reveal="">
 <h2 class="rank-name">Elite</h2>
 <p class="price">$20.99 <small>/ mo</small></p>
-<p class="section-text">
-Highest support rank with all Premium perks, maximum listed limits, and travel commands.
-</p>
-<ul class="perk-list">
+<ul class="perk-list perk-list-short">
 <li>All Premium perks</li>
 <li>Up to 150 claims</li>
-<li>Up to 25 force-loaded claims</li>
 <li>6 <code>/homes</code></li>
+</ul>
+<details class="perk-details">
+<summary>Full perks</summary>
+<ul class="perk-list">
+<li>Up to 25 force-loaded claims</li>
 <li><code>/rescale</code></li>
 <li><code>/tpa</code>, <code>/tpahere</code>, and <code>/rtp</code></li>
 <li>Elite badge</li>
 </ul>
+</details>
 <div class="rank-actions">
 <button class="button button-primary" data-tebex-package="elite" type="button">
 <img alt="" class="button-icon" src="/assets/icons/store.svg"/>
@@ -158,23 +143,16 @@ Buy Elite
 <a href="/account/?return=/store/&reason=checkout">Login</a> and link your
 in-game username before buying a rank.
 </div>
-<div class="notice" data-reveal="">
-<strong>Note:</strong> Ranks are monthly support tiers. Secure checkout handles payment processing.
-Purchases require a signed-in account with a linked Minecraft username.
-</div>
 </section>
 </main>
 <footer class="footer">
 <div class="site-shell footer-inner">
-<span>Capital Industries · Season 3 Modded Minecraft</span>
+<span>Capital Industries Season 3</span>
 <nav aria-label="Footer links" class="footer-links">
-<a href="/download">Download</a>
-<a href="/store">Ranks</a>
-<a href="/account">Account</a>
-<a href="https://map.capitalindustries.net/" rel="noopener noreferrer" target="_blank">Live Map</a>
 <a href="https://discord.gg/jj7fFEYYfk" rel="noopener noreferrer" target="_blank">Discord</a>
-<a href="https://www.curseforge.com/minecraft/modpacks/capital-industries-server" rel="noopener noreferrer" target="_blank">CurseForge</a>
-<a href="https://www.modpackindex.com/modpack/117341/capital-industries-server" rel="noopener noreferrer" target="_blank">Modpack Index</a>
+<a href="https://map.capitalindustries.net/" rel="noopener noreferrer" target="_blank">Map</a>
+<a href="/store">Store</a>
+<a href="https://discord.gg/jj7fFEYYfk" rel="noopener noreferrer" target="_blank">Support</a>
 </nav>
 </div>
 </footer>

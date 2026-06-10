@@ -58,6 +58,8 @@
 
   var linkedUsername = "";
   var activeSubscription = null;
+  var canCheckoutNow = false;
+  var loggedInNow = false;
   var subscriptionPollTimer = 0;
   var checkoutReturnPending = false;
   function waitForAuth() {
@@ -73,6 +75,27 @@
 
       check();
     });
+  }
+
+  function updateAuthBar(loggedIn, username, canCheckout) {
+    var text = document.getElementById("store-auth-bar-text");
+    var action = document.getElementById("store-auth-bar-action");
+
+    if (!text || !action) {
+      return;
+    }
+
+    if (!loggedIn) {
+      text.textContent = "Sign in before checkout";
+      action.textContent = "Sign in";
+      action.href = "/account/?return=/store/&reason=checkout";
+      action.hidden = false;
+      return;
+    }
+
+    text.textContent =
+      "Signed in as " + (username || "Account") + " · Minecraft: " + (canCheckout ? username : "not linked");
+    action.hidden = true;
   }
 
   function setAuthNoticeVisible(visible) {
@@ -103,14 +126,18 @@
       setAuthNoticeVisible(true);
       activeSubscription = null;
       linkedUsername = "";
+      canCheckoutNow = false;
+      loggedInNow = false;
       updateRankUI(false, null);
-      updateActiveRankBanner(null);
+      updateAuthBar(false, "", false);
       return;
     }
 
     try {
       var loggedIn = await window.CapitalAuth.isLoggedIn();
       var complete = loggedIn && await window.CapitalAuth.hasCompleteProfile();
+      loggedInNow = loggedIn;
+      canCheckoutNow = complete;
 
       linkedUsername = complete ? await window.CapitalAuth.getMinecraftUsername() : "";
       activeSubscription =
@@ -119,6 +146,7 @@
           : null;
 
       setAuthNoticeVisible(!complete);
+      updateAuthBar(loggedIn, linkedUsername, complete);
 
       if (activeSubscription) {
         checkoutReturnPending = false;
@@ -127,13 +155,12 @@
       }
 
       updateRankUI(complete, activeSubscription);
-      updateActiveRankBanner(activeSubscription);
       updateConfirmState();
     } catch (error) {
       console.error(error);
       setStatus(error.message || "Could not load store account state.");
       updateRankUI(false, null);
-      updateActiveRankBanner(null);
+      updateAuthBar(false, "", false);
     }
   }
 
@@ -202,37 +229,8 @@
     window.history.replaceState({}, "", url);
   }
 
-  function updateActiveRankBanner(subscription) {
-    var activeBanner = document.getElementById("store-active-rank-banner");
-    var activeTitle = document.getElementById("store-active-rank-title");
-    var activeDetail = document.getElementById("store-active-rank-detail");
-
+  function updateActiveRankBanner() {
     cleanCheckoutReturnParam();
-
-    if (!subscription) {
-      if (activeBanner) {
-        activeBanner.hidden = true;
-      }
-      return;
-    }
-
-    if (activeBanner) {
-      activeBanner.hidden = false;
-    }
-
-    if (activeTitle) {
-      activeTitle.textContent =
-        "You have " +
-        (PACKAGE_DISPLAY[subscription.rank_key] || { name: "a rank" }).name +
-        " active.";
-    }
-
-    if (activeDetail) {
-      activeDetail.textContent =
-        "This is your current plan for " +
-        (subscription.minecraft_username || linkedUsername || "your account") +
-        ". Cancel your current plan before buying a different rank.";
-    }
   }
 
   function getRankCard(packageKey) {
@@ -272,7 +270,7 @@
 
       var packageKey = button.getAttribute("data-tebex-package");
       var card = getRankCard(packageKey);
-      var disabled = !RANK_PURCHASES_ENABLED || !canCheckout;
+      var disabled = !RANK_PURCHASES_ENABLED;
 
       if (subscription && subscription.rank_key) {
         var activeName =
@@ -280,7 +278,7 @@
 
         if (subscription.rank_key === packageKey) {
           disabled = true;
-          button.textContent = "Your current plan";
+          button.textContent = "Current plan";
           button.classList.add("button-rank-owned");
           button.setAttribute("data-rank-action", "owned");
 
@@ -288,7 +286,7 @@
             card.classList.add("rank-card-active");
             var badge = document.createElement("span");
             badge.className = "rank-current-badge status-pill";
-            badge.textContent = "Your current plan";
+            badge.textContent = "Current plan";
             var price = card.querySelector(".price");
             if (price) {
               price.insertAdjacentElement("afterend", badge);
@@ -298,26 +296,26 @@
           }
         } else {
           disabled = false;
-          button.textContent = "Cancel " + activeName + " first";
+          button.textContent = "Manage in Tebex";
           button.classList.add("button-ghost", "button-rank-manage");
-          button.setAttribute("data-rank-action", "manage");
+          button.setAttribute("data-rank-action", "tebex-manage");
 
           if (card) {
             card.classList.add("rank-card-blocked");
-            var note = document.createElement("p");
-            note.className = "rank-status-note";
-            note.textContent =
-              "You already have " +
-              activeName +
-              " active. Manage your subscription on the account page before buying another rank.";
-            var actions = card.querySelector(".rank-actions");
-            if (actions) {
-              actions.insertBefore(note, actions.firstChild);
-            }
           }
         }
       } else {
-        button.classList.add("button-primary");
+        if (!loggedInNow) {
+          button.textContent = "Sign in to buy";
+          button.classList.add("button-ghost");
+          button.setAttribute("data-rank-action", "login");
+        } else if (!canCheckout) {
+          button.textContent = "Link username first";
+          button.classList.add("button-ghost");
+          button.setAttribute("data-rank-action", "setup");
+        } else {
+          button.classList.add("button-primary");
+        }
       }
 
       button.disabled = disabled;
@@ -696,8 +694,22 @@
       return;
     }
 
-    if (rankAction === "manage") {
-      window.location.href = "/account/#subscription-manage";
+    if (rankAction === "tebex-manage") {
+      if (!window.CapitalTebexPortal || typeof window.CapitalTebexPortal.launch !== "function") {
+        setStatus("Subscription manager is temporarily unavailable.");
+        return;
+      }
+      window.CapitalTebexPortal.launch();
+      return;
+    }
+
+    if (rankAction === "login") {
+      redirectToAccount(false);
+      return;
+    }
+
+    if (rankAction === "setup") {
+      redirectToAccount(true);
       return;
     }
 
