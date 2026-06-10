@@ -146,15 +146,25 @@
     slot.appendChild(dropdown);
   }
 
+  function clearNavAccountSlot() {
+    const slot = document.getElementById("nav-account-slot");
+
+    if (slot) {
+      slot.innerHTML = "";
+    }
+  }
+
   function boot() {
     setActiveNavLink();
-    renderLoginFallback();
 
     const auth = window.CapitalAuth;
 
     if (!auth || typeof auth.ready !== "function") {
+      renderLoginFallback();
       return;
     }
+
+    clearNavAccountSlot();
 
     auth.ready().then(function () {
       return renderAccountSlot();

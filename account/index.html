@@ -54,7 +54,12 @@ Account services are not available right now.
 <strong>Account required to buy ranks.</strong> Sign in below, confirm your in-game name in the popup, then return to the store.
 </div>
 <div class="account-layout" data-reveal="">
-<article class="panel account-panel" id="auth-panel">
+<article class="panel account-panel account-loading-panel" id="account-loading-panel" aria-busy="true">
+<p class="eyebrow">Account</p>
+<h2 class="link-title">Loading your account</h2>
+<p class="link-text">Checking your sign-in status…</p>
+</article>
+<article class="panel account-panel" hidden id="auth-panel">
 <h2 class="link-title">Login or create account</h2>
 <p class="link-text">Public login is Google or Discord only.</p>
 <div class="account-oauth-actions">
@@ -99,7 +104,8 @@ Continue with Discord
 Only one rank subscription is allowed at a time. To change ranks, cancel your current plan first, then purchase a new rank.
 </p>
 <div class="account-subscription-actions" id="subscription-manage">
-<button class="button button-ghost" id="cancel-subscription-button" type="button">Cancel subscription</button>
+<button class="button button-ghost" id="cancel-subscription-button" type="button">Manage / cancel subscription</button>
+<p aria-live="polite" class="account-status" id="cancel-subscription-status"></p>
 </div>
 </div>
 </div>
@@ -163,11 +169,11 @@ I confirm <strong id="profile-username-preview">this username</strong> is my cur
 </nav>
 </div>
 </footer>
-<script defer src="https://js.tebex.io/v/1.js"></script>
 <script src="/assets/supabase-config.js"></script>
 <script src="/assets/tebex-config.js"></script>
-<script defer src="/assets/site-nav.js"></script>
+<script defer src="https://js.tebex.io/v/1.js"></script>
 <script defer src="/assets/tebex-portal.js"></script>
+<script defer src="/assets/site-nav.js"></script>
 <script type="module" src="/assets/auth-client.js"></script>
 <script type="module" src="/assets/profile-setup.js"></script>
 <script type="module" src="/assets/account.js"></script>

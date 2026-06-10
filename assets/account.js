@@ -1,4 +1,5 @@
 const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,16}$/;
+let initialAccountLoad = true;
 
 function byId(id) {
   return document.getElementById(id);
@@ -312,50 +313,74 @@ function showCheckoutNotice() {
   }
 }
 
+function setAccountLoading(loading) {
+  setPanelHidden("account-loading-panel", !loading);
+
+  const loadingPanel = byId("account-loading-panel");
+
+  if (loadingPanel) {
+    loadingPanel.setAttribute("aria-busy", loading ? "true" : "false");
+  }
+}
+
 async function refreshAccountView() {
   const warning = byId("account-service-warning");
+  const showLoadingGate = initialAccountLoad;
+
+  if (showLoadingGate) {
+    setPanelHidden("auth-panel", true);
+    setPanelHidden("account-session-panel", true);
+    setAccountLoading(true);
+  }
 
   showCheckoutNotice();
 
-  if (!window.CapitalAuth || typeof window.CapitalAuth.ready !== "function") {
-    if (warning) {
-      warning.hidden = false;
-      warning.textContent = "Account services failed to load. Refresh the page.";
+  try {
+    if (!window.CapitalAuth || typeof window.CapitalAuth.ready !== "function") {
+      if (warning) {
+        warning.hidden = false;
+        warning.textContent = "Account services failed to load. Refresh the page.";
+      }
+      await renderSignedOut();
+      return;
     }
-    await renderSignedOut();
-    return;
-  }
 
-  await window.CapitalAuth.ready();
+    await window.CapitalAuth.ready();
 
-  if (!window.CapitalAuth.configured) {
-    if (warning) {
-      warning.hidden = false;
-      warning.textContent =
-        "Account sign-in is temporarily unavailable. Please try again later.";
+    if (!window.CapitalAuth.configured) {
+      if (warning) {
+        warning.hidden = false;
+        warning.textContent =
+          "Account sign-in is temporarily unavailable. Please try again later.";
+      }
+      await renderSignedOut();
+      return;
     }
-    await renderSignedOut();
-    return;
+
+    if (warning) {
+      warning.hidden = true;
+    }
+
+    const user = await window.CapitalAuth.getSessionUser();
+
+    if (!user) {
+      await renderSignedOut();
+      return;
+    }
+
+    const profile = await window.CapitalAuth.getProfile();
+    const complete = await window.CapitalAuth.hasCompleteProfile();
+    const forceSetup = new URLSearchParams(window.location.search).get("setup") === "1";
+
+    await renderSignedIn(user, profile, {
+      needsSetup: !complete || forceSetup
+    });
+  } finally {
+    if (showLoadingGate) {
+      setAccountLoading(false);
+      initialAccountLoad = false;
+    }
   }
-
-  if (warning) {
-    warning.hidden = true;
-  }
-
-  const user = await window.CapitalAuth.getSessionUser();
-
-  if (!user) {
-    await renderSignedOut();
-    return;
-  }
-
-  const profile = await window.CapitalAuth.getProfile();
-  const complete = await window.CapitalAuth.hasCompleteProfile();
-  const forceSetup = new URLSearchParams(window.location.search).get("setup") === "1";
-
-  await renderSignedIn(user, profile, {
-    needsSetup: !complete || forceSetup
-  });
 }
 
 function updateProfileSubmitState() {
@@ -435,13 +460,35 @@ async function boot() {
   const cancelSubscriptionButton = byId("cancel-subscription-button");
 
   if (cancelSubscriptionButton) {
-    cancelSubscriptionButton.addEventListener("click", function () {
-      if (window.CapitalTebexPortal && typeof window.CapitalTebexPortal.launch === "function") {
-        window.CapitalTebexPortal.launch();
-        return;
-      }
+    cancelSubscriptionButton.addEventListener("click", async function () {
+      setStatus("cancel-subscription-status", "");
+      cancelSubscriptionButton.disabled = true;
+      cancelSubscriptionButton.setAttribute("aria-busy", "true");
 
-      window.open("https://checkout.tebex.io/", "_blank", "noopener,noreferrer");
+      try {
+        if (!window.CapitalTebexPortal || typeof window.CapitalTebexPortal.launch !== "function") {
+          throw new Error("Subscription manager is temporarily unavailable.");
+        }
+
+        const result = await window.CapitalTebexPortal.launch();
+
+        if (result && result.mode === "fallback") {
+          setStatus(
+            "cancel-subscription-status",
+            "Opened the subscription manager in a new tab. Sign in with the same email you used at checkout.",
+            "success"
+          );
+        }
+      } catch (error) {
+        setStatus(
+          "cancel-subscription-status",
+          error.message || "Could not open the subscription manager.",
+          "error"
+        );
+      } finally {
+        cancelSubscriptionButton.disabled = false;
+        cancelSubscriptionButton.setAttribute("aria-busy", "false");
+      }
     });
   }
 
