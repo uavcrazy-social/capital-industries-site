@@ -744,17 +744,10 @@ h1, h2, h3, p { margin-top: 0; }
 .play-step {
   padding: 22px;
 }
-.play-options {
-  padding: 18px 22px;
-}
-.play-options > summary {
-  color: var(--orange-bright);
-  font-weight: 700;
-  cursor: pointer;
-}
-.play-options > summary:focus-visible {
-  outline: 2px solid var(--orange-bright);
-  outline-offset: 2px;
+.play-download-note {
+  margin: 10px 0 0;
+  font-size: 0.82rem;
+  color: var(--muted-2);
 }
 .account-subscription-actions {
   margin-top: 16px;
