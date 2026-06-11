@@ -98,14 +98,6 @@
     action.hidden = true;
   }
 
-  function setAuthNoticeVisible(visible) {
-    var notice = document.getElementById("store-auth-notice");
-
-    if (notice) {
-      notice.hidden = !visible;
-    }
-  }
-
   function rememberButtonDefault(button) {
     if (!button.getAttribute("data-default-html")) {
       button.setAttribute("data-default-html", button.innerHTML);
@@ -123,7 +115,6 @@
     await waitForAuth();
 
     if (!window.CapitalAuth || !window.CapitalAuth.configured) {
-      setAuthNoticeVisible(true);
       activeSubscription = null;
       linkedUsername = "";
       canCheckoutNow = false;
@@ -145,7 +136,6 @@
           ? await window.CapitalAuth.getActiveSubscription()
           : null;
 
-      setAuthNoticeVisible(!complete);
       updateAuthBar(loggedIn, linkedUsername, complete);
 
       if (activeSubscription) {

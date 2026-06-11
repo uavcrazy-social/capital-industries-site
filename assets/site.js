@@ -3,8 +3,11 @@
 
   var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var prefetched = new Set();
-  var ticking = false;
-
+  var GLOW_START_KEY = "cci-ambient-glow-start";
+  var GLOW_SPOTS = [
+    { className: "glow-spot glow-spot--top-left", duration: 32 },
+    { className: "glow-spot glow-spot--bottom-right", duration: 38 }
+  ];
   function setText(element, text) {
     if (element) {
       element.textContent = text;
@@ -64,29 +67,45 @@
     });
   }
 
-  function updateParallax() {
-    if (prefersReducedMotion) {
+  function getGlowStartTime() {
+    var stored = sessionStorage.getItem(GLOW_START_KEY);
+
+    if (stored) {
+      return parseInt(stored, 10);
+    }
+
+    var now = Date.now();
+    sessionStorage.setItem(GLOW_START_KEY, String(now));
+    return now;
+  }
+
+  function getGlowAnimationDelay(durationSeconds) {
+    var cycleMs = durationSeconds * 2000;
+    var elapsed = Date.now() - getGlowStartTime();
+    return -((elapsed % cycleMs) / 1000);
+  }
+
+  function initializeAmbientGlow() {
+    if (!document.body || document.querySelector(".ambient-glow")) {
       return;
     }
 
-    if (ticking) {
-      return;
-    }
+    var container = document.createElement("div");
+    container.className = "ambient-glow";
+    container.setAttribute("aria-hidden", "true");
 
-    ticking = true;
-    window.requestAnimationFrame(function () {
-      var scrollY = window.scrollY;
-      var docHeight = Math.max(
-        document.documentElement.scrollHeight,
-        document.body ? document.body.scrollHeight : 0
-      );
-      var glowY = Math.round(scrollY / -2);
-      var coverage = docHeight + Math.abs(glowY) + window.innerHeight;
+    GLOW_SPOTS.forEach(function (config) {
+      var spot = document.createElement("span");
+      spot.className = config.className;
 
-      document.documentElement.style.setProperty("--parallax-glow-y", glowY + "px");
-      document.documentElement.style.setProperty("--ambient-height", coverage + "px");
-      ticking = false;
+      if (!prefersReducedMotion) {
+        spot.style.setProperty("--glow-delay", getGlowAnimationDelay(config.duration).toFixed(3) + "s");
+      }
+
+      container.appendChild(spot);
     });
+
+    document.body.insertBefore(container, document.body.firstChild);
   }
 
   function initializeRevealAnimations() {
@@ -176,11 +195,9 @@
     });
   }
 
+  initializeAmbientGlow();
   initializeCopyButtons();
   initializeDownloadChecks();
   initializeRevealAnimations();
   initializeNavigationEnhancements();
-  updateParallax();
-  window.addEventListener("scroll", updateParallax, { passive: true });
-  window.addEventListener("resize", updateParallax, { passive: true });
 }());

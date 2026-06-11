@@ -183,20 +183,25 @@ async function promptUsernameSetupIfNeeded() {
 }
 
 function updateAccountHero(signedIn) {
+  const tagline = byId("account-hero-tagline");
+
   if (signedIn) {
     setText("account-hero-title", "Account");
     setText(
       "account-hero-tagline",
       "Manage your profile, linked Minecraft username, and subscriptions."
     );
+    if (tagline) {
+      tagline.hidden = false;
+    }
     return;
   }
 
   setText("account-hero-title", "Sign in");
-  setText(
-    "account-hero-tagline",
-    "Use Google or Discord to link your Minecraft username and buy ranks."
-  );
+  if (tagline) {
+    tagline.hidden = true;
+    tagline.textContent = "";
+  }
 }
 
 async function renderSignedOut() {
