@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  var RANK_PURCHASES_ENABLED = true;
+  var RANK_PURCHASES_ENABLED = false;
 
   var TEBEX_PUBLIC_TOKEN = String(window.CAPITAL_TEBEX_PUBLIC_TOKEN || "13bmd-225b100e916451ed82c9e96183f8929d044f437c");
   var PACKAGE_IDS = {
@@ -84,6 +84,19 @@
     if (!text || !action) {
       return;
     }
+
+    if (!RANK_PURCHASES_ENABLED) {
+      text.textContent = "Rank purchases are temporarily unavailable";
+      action.textContent = "Donate on Ko-fi";
+      action.href = "https://ko-fi.com/dtmpro621";
+      action.target = "_blank";
+      action.rel = "noopener noreferrer";
+      action.hidden = false;
+      return;
+    }
+
+    action.removeAttribute("target");
+    action.removeAttribute("rel");
 
     if (!loggedIn) {
       text.textContent = "Sign in before checkout";
