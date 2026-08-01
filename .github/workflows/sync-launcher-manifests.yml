@@ -1,0 +1,40 @@
+name: Sync launcher manifests
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch latest*.yml from launcher host
+        run: |
+          set -euo pipefail
+          mkdir -p assets/launcher
+          base="http://launcher.capitalindustries.net/launcher"
+          for f in latest.yml latest-mac.yml latest-linux.yml; do
+            curl -fsSL "$base/$f" -o "assets/launcher/$f"
+            echo "synced $f"
+            head -n 5 "assets/launcher/$f"
+          done
+
+      - name: Commit if changed
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/launcher/latest.yml assets/launcher/latest-mac.yml assets/launcher/latest-linux.yml
+          if git diff --staged --quiet; then
+            echo "No manifest changes"
+            exit 0
+          fi
+          git commit -m "Sync launcher latest*.yml manifests"
+          git push

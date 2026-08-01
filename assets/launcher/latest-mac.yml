@@ -1,0 +1,11 @@
+version: 1.1.0
+files:
+  - url: CCI Launcher-1.1.0-mac-arm64.zip
+    sha512: IeEJ1brB3poOfeeqDp2y45fokB5zM+9GZYZWDfgNxo9YlXl83bOC6hgDbQ7bjs4gO15TkwAycAW8N0vCE2ir2Q==
+    size: 111920855
+  - url: CCI Launcher-1.1.0-mac-arm64.dmg
+    sha512: KL5pyiWCrs0ILqjjtdsW7lZtG0JNfPPlbN6o05LcMf6PCgNbux+bKVTuv0PreJrU/fy5wSmRrl0CtrDLXWsjAA==
+    size: 115842595
+path: CCI Launcher-1.1.0-mac-arm64.zip
+sha512: IeEJ1brB3poOfeeqDp2y45fokB5zM+9GZYZWDfgNxo9YlXl83bOC6hgDbQ7bjs4gO15TkwAycAW8N0vCE2ir2Q==
+releaseDate: '2026-07-06T15:00:55.683Z'

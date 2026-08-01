@@ -50,25 +50,25 @@
 <span class="status-pill">1. Download launcher</span>
 <h2 class="section-title compact-title">Get the game launcher</h2>
 </div>
-<div class="actions no-top-margin">
-<a class="button button-primary" href="http://launcher.capitalindustries.net/launcher/CCI%20Launcher-1.1.2-win-x64.exe">
+<div class="actions no-top-margin" data-launcher-downloads="">
+<a class="button button-primary" data-launcher-channel="windows" href="http://launcher.capitalindustries.net/launcher/CCI%20Launcher-1.1.2-win-x64.exe">
 <img alt="" class="button-icon" src="/assets/icons/download-dark.svg"/>
             Windows (1.1.2)
           </a>
-<a class="button" href="http://launcher.capitalindustries.net/launcher/CCI%20Launcher-1.1.0-mac-arm64.dmg">
+<a class="button" data-launcher-channel="mac" href="http://launcher.capitalindustries.net/launcher/CCI%20Launcher-1.1.0-mac-arm64.dmg">
 <img alt="" class="button-icon" src="/assets/icons/download.svg"/>
             macOS (1.1.0)
           </a>
-<a class="button" href="http://launcher.capitalindustries.net/launcher/CCI%20Launcher-1.1.0-linux-amd64.deb">
+<a class="button" data-launcher-channel="linux" href="http://launcher.capitalindustries.net/launcher/CCI%20Launcher-1.1.2.AppImage">
 <img alt="" class="button-icon" src="/assets/icons/download.svg"/>
-            Linux .deb (1.1.0)
+            Linux AppImage (1.1.2)
           </a>
 <a class="button" href="http://launcher.capitalindustries.net/api/active/curseforge">
 <img alt="" class="button-icon" src="/assets/icons/download.svg"/>
             Download full mods zip
           </a>
 </div>
-<p class="link-text play-download-note">mc 1.21.1 neo 21.1.227 · Windows is on 1.1.2; macOS / .deb latest published builds are 1.1.0</p>
+<p class="link-text play-download-note" data-launcher-note="">mc 1.21.1 neo 21.1.227 · resolving latest launcher builds…</p>
 </article>
 <article class="panel play-step">
 <div>
@@ -111,5 +111,6 @@
 <script type="module" src="/assets/auth-client.js"></script>
 <script type="module" src="/assets/profile-setup.js"></script>
 <script defer src="/assets/site.js"></script>
+<script defer src="/assets/launcher-downloads.js"></script>
 </body>
 </html>

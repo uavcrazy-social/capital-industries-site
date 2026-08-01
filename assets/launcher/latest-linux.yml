@@ -1,0 +1,9 @@
+version: 1.1.2
+files:
+  - url: CCI Launcher-1.1.2.AppImage
+    sha512: GnPSvaP7/+vQLKEQDL94Ai4ZeXZ1rFiqxati+RICknSwMCHFUUAg2Aaz/b21ZrUAFunopLqfBHSzhF5jT9OMTA==
+    size: 131107302
+    blockMapSize: 137722
+path: CCI Launcher-1.1.2.AppImage
+sha512: GnPSvaP7/+vQLKEQDL94Ai4ZeXZ1rFiqxati+RICknSwMCHFUUAg2Aaz/b21ZrUAFunopLqfBHSzhF5jT9OMTA==
+releaseDate: '2026-07-25T23:40:04.894Z'
